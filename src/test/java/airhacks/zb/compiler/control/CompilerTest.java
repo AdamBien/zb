@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 public class CompilerTest {
     @Test
     void compile() throws IOException {
-        var result = Compiler.compile(Path.of("."));
+        var input = Path.of("src/main/java");
+        var output = Path.of("target/test/classes");
+        var result = Compiler.compile(input,output);
         assertThat(result).isTrue();
     }
 }
