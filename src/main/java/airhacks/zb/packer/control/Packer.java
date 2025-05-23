@@ -1,21 +1,22 @@
 package airhacks.zb.packer.control;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.jar.JarOutputStream;
 
 public interface Packer {
 
-    static void archive(Path rootClassesDirectory, Path rootJARDirectory, String jarFileName) {
+    static void archive(Path rootClassesDirectory, Path rootJARDirectory, String jarFileName) throws IOException {
         var jarFile = rootJARDirectory.resolve(jarFileName);
-        try (var fos = Files.newOutputStream(jarFile);
+        Files.createDirectories(rootJARDirectory);
+        try (var fos = Files.newOutputStream(jarFile,StandardOpenOption.CREATE);
                 var jos = new JarOutputStream(fos)) {
             try (var paths = Files.walk(rootClassesDirectory)) {
                 paths.filter(path -> path.toString().endsWith(".class"))
                         .forEach(path -> addEntry(rootClassesDirectory, jos, path));
             }
-        } catch (java.io.IOException e) {
-            throw new RuntimeException("Failed to create JAR file", e);
         }
     }
 
