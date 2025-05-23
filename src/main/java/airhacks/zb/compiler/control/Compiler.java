@@ -9,9 +9,9 @@ import javax.tools.ToolProvider;
 
 import airhacks.zb.discovery.control.JavaFiles;
 
-interface Compiler {
+public interface Compiler {
 
-  static boolean compile(Path rootSourceDirectory,Path rootOutputDirectory) throws IOException {
+  public static boolean compile(Path rootSourceDirectory,Path rootOutputDirectory) throws IOException {
     var javaFiles =  JavaFiles.findFrom(rootSourceDirectory);
     return compile(javaFiles, rootOutputDirectory);
   }
