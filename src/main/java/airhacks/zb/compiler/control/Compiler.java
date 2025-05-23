@@ -1,17 +1,17 @@
+package airhacks.zb.compiler.control;
 
-import java.util.List;
-import static java.lang.System.out;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
-import javax.tools.Tool;
 import javax.tools.ToolProvider;
 
 import airhacks.zb.discovery.control.JavaFiles;
 
 interface Compiler {
 
-  static boolean compile(Path rootDirectory) {
+  static boolean compile(Path rootDirectory) throws IOException {
     var javaFiles =  JavaFiles.findFrom(rootDirectory);
     return compile(javaFiles);
   }
