@@ -12,12 +12,20 @@ import airhacks.zb.packer.control.Packer;
  */
 interface App {
 
+    record Arguments(Path sourceDirectory, Path classesDirectory, Path jarDirectory, String jarFileName) {
+        static Arguments from(String... args) {
+            return new Arguments(
+                Path.of(args.length > 0 ? args[0] : "src/main/java"),
+                Path.of(args.length > 1 ? args[1] : "target/test/classes"),
+                Path.of(args.length > 2 ? args[2] : "target/test/jar"),
+                args.length > 3 ? args[3] : "test.jar"
+            );
+        }
+    }
+    
     static void main(String... args) throws IOException {
-        var sourceDirectory = Path.of("src/main/java");
-        var classesDirectory =  Path.of("target/test/classes");
-        var jarDirectory = Path.of("target/test/jar");
-        var jarFileName = "test.jar";
-        Compiler.compile(sourceDirectory,classesDirectory);
-        Packer.archive(classesDirectory, jarDirectory, jarFileName);
+        var arguments = Arguments.from(args);
+        Compiler.compile(arguments.sourceDirectory(), arguments.classesDirectory());
+        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName());
     }
 }
