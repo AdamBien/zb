@@ -1,5 +1,6 @@
 package airhacks.zb.log.boundary;
 
+import java.io.IOException;
 import java.io.PrintStream;
 
 public enum Log {
@@ -56,7 +57,7 @@ public enum Log {
             Log.DEBUG.out(message);
     }
 
-    public static void error(String message) {
+    public static void error(String message, Exception e) {
         Log.ERROR.out(message);
     }
 

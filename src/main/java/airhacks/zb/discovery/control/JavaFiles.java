@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import airhacks.zb.log.boundary.Log;
+
 public interface JavaFiles {
 
     static List<Path> findFrom(Path rootDir) throws IOException {
@@ -14,6 +16,24 @@ public interface JavaFiles {
                     .filter(path -> path.toString().endsWith(".java"))
                     .toList();
         }
+    }
 
+    static List<Path> findMain(List<Path> javaPaths){
+        return javaPaths.stream()
+                .filter(JavaFiles::containsMainMethod)
+                .toList();
+    }
+
+    static boolean containsMainMethod(Path path) {
+        return contentContains(path, " main(");
+    }
+
+    static boolean contentContains(Path path, String content) {
+        try {
+            return Files.readString(path).contains(content);
+        } catch (IOException e) {
+            Log.error("Failed to read file: " + path, e);
+            return false;
+        }
     }
 }
