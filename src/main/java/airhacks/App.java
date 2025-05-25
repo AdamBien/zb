@@ -25,7 +25,7 @@ interface App {
             );
         }
 
-        public void userInfo() { Log.user("Source: " + sourceDirectory + ", Classes: " + classesDirectory + ", JAR Dir: " + jarDirectory + ", JAR: " + jarFileName); }
+        public void userInfo() { Log.user("🔍 source: " + sourceDirectory + ", classes: " + classesDirectory + ", JAR dir: " + jarDirectory + ", JAR file: " + jarFileName); }
             
     }
     
