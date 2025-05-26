@@ -35,7 +35,7 @@ interface App {
         Compiler.compile(javaFiles, arguments.classesDirectory());
         var mainClass = JavaFiles.findMainClass(javaFiles);
         Log.debug("main class: " + mainClass);
-        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName());
+        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName(), mainClass);
     }
     
     static void main(String... args) throws IOException {

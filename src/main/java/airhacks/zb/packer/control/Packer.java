@@ -4,11 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Optional;
+import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
 public interface Packer {
 
-    static void archive(Path rootClassesDirectory, Path rootJARDirectory, String jarFileName) throws IOException {
+
+    static void archive(Path rootClassesDirectory, Path rootJARDirectory, String jarFileName,Optional<Path> mainClass) throws IOException {
         var jarFile = rootJARDirectory.resolve(jarFileName);
         Files.createDirectories(rootJARDirectory);
         try (var fos = Files.newOutputStream(jarFile,StandardOpenOption.CREATE);
@@ -17,18 +20,42 @@ public interface Packer {
                 paths.filter(path -> path.toString().endsWith(".class"))
                         .forEach(path -> addEntry(rootClassesDirectory, jos, path));
             }
+           mainClass.ifPresent(mc -> addManifest(rootClassesDirectory, jos, mc));
         }
     }
 
-    static void addEntry(Path rootClassesDirectory, JarOutputStream jarOutputStream, Path path) {
+    static void addManifest(Path rootClassesDirectory, JarOutputStream jos,Path mainClass)  {
+        var fullyQualifiedClassName = mainClass.getFileName().toString().replace(".java", "");
+        var manifest = Manifestor.manifest(fullyQualifiedClassName);
         try {
-            var relativePath = rootClassesDirectory.relativize(path);
-            var entry = new java.util.jar.JarEntry(relativePath.toString());
-            jarOutputStream.putNextEntry(entry);
-            jarOutputStream.write(Files.readAllBytes(path));
-            jarOutputStream.closeEntry();
-        } catch (java.io.IOException e) {
+            manifest.write(jos);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to add manifest to JAR: ", e);
+        }
+    }
+
+    static void addEntry(Path rootClassesDirectory, JarOutputStream jos, Path relativePath, String content)  {
+            try {
+                var path = rootClassesDirectory.relativize(relativePath);
+                var entry = new JarEntry(path.toString());
+                jos.putNextEntry(entry);
+                jos.write(content.getBytes());
+                jos.closeEntry();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to add file to JAR: " + relativePath, e);
+            }
+        
+    }
+
+
+    static void addEntry(Path rootClassesDirectory, JarOutputStream jarOutputStream, Path path) {
+        var relativePath = rootClassesDirectory.relativize(path);
+        try {
+            var content = Files.readString(path);
+            addEntry(rootClassesDirectory, jarOutputStream, relativePath, content);
+        } catch (IOException e) {
             throw new RuntimeException("Failed to add file to JAR: " + path, e);
         }
+
     }
 }
