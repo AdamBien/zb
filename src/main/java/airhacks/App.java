@@ -6,6 +6,7 @@ import airhacks.zb.compiler.control.Compiler;
 import airhacks.zb.discovery.control.JavaFiles;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
+import static airhacks.App.Defaults.*;
 
 
 /**
@@ -16,12 +17,29 @@ interface App {
 
     String VERSION = "zb v2025.05.26.1";
 
+    enum Defaults {
+        SOURCE_DIR("src/main/java"),
+        CLASSES_DIR("target/test/classes"),
+        JAR_DIR("target/test/jar");
+
+        private final String path;
+
+        Defaults(String path) {
+            this.path = path;
+        }
+
+        public String path() {
+            return path;
+        }
+
+    }
+
     record Arguments(Path sourceDirectory, Path classesDirectory, Path jarDirectory, String jarFileName) {
         static Arguments from(String... args) {
             return new Arguments(
-                Path.of(args.length > 0 ? args[0] : "src/main/java"),
-                Path.of(args.length > 1 ? args[1] : "target/test/classes"),
-                Path.of(args.length > 2 ? args[2] : "target/test/jar"),
+                Path.of(args.length > 0 ? args[0] : SOURCE_DIR.path()),
+                Path.of(args.length > 1 ? args[1] : CLASSES_DIR.path()),
+                Path.of(args.length > 2 ? args[2] : JAR_DIR.path()),
                 args.length > 3 ? args[3] : "zb.jar"
             );
         }
