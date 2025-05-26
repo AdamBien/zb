@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import airhacks.zb.log.boundary.Log;
 
@@ -18,10 +19,26 @@ public interface JavaFiles {
         }
     }
 
-    static List<Path> findMain(List<Path> javaPaths){
-        return javaPaths.stream()
+    static List<Path> findMain(List<Path> javaPaths) {
+        return javaPaths
+                .stream()
                 .filter(JavaFiles::containsMainMethod)
                 .toList();
+    }
+
+    static Optional<Path> findMainClass(List<Path> javaPaths) {
+        var mainClasses = findMain(javaPaths);
+        
+        if (mainClasses.isEmpty()) {
+            Log.warning("No main class found");
+            return Optional.empty();
+        }
+        if (mainClasses.size() > 1) {
+            Log.warning("Multiple main classes found");
+            System.exit(0);
+        }
+        return Optional.of(mainClasses.getFirst());
+
     }
 
     static boolean containsMainMethod(Path path) {

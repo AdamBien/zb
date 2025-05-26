@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 import airhacks.zb.compiler.control.Compiler;
+import airhacks.zb.discovery.control.JavaFiles;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
 
@@ -13,7 +14,7 @@ import airhacks.zb.packer.control.Packer;
  */
 interface App {
 
-    String VERSION = "zb v2025.05.25.1";
+    String VERSION = "zb v2025.05.25.2";
 
     record Arguments(Path sourceDirectory, Path classesDirectory, Path jarDirectory, String jarFileName) {
         static Arguments from(String... args) {
@@ -28,12 +29,19 @@ interface App {
         public void userInfo() { Log.user("🔍 source: " + sourceDirectory + ", classes: " + classesDirectory + ", JAR dir: " + jarDirectory + ", JAR file: " + jarFileName); }
             
     }
+
+    static void build(Arguments arguments) throws IOException {
+        var javaFiles = JavaFiles.findFrom(arguments.sourceDirectory());
+        Compiler.compile(javaFiles, arguments.classesDirectory());
+        var mainClass = JavaFiles.findMainClass(javaFiles);
+        Log.debug("main class: " + mainClass);
+        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName());
+    }
     
     static void main(String... args) throws IOException {
         Log.user("🚀 " + VERSION + " - fast and pure Java 🛠️");
         var arguments = Arguments.from(args);
         arguments.userInfo();
-        Compiler.compile(arguments.sourceDirectory(), arguments.classesDirectory());
-        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName());
+        build(arguments);
     }
 }

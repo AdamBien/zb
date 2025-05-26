@@ -9,7 +9,7 @@ public enum Log {
     PROMPT(Color.PROMPT, System.out),
     INFO(Color.INFO, System.out),
     SYSTEM(Color.DARKBLUE, System.out),
-    ANSWER(Color.ANSWER, System.out),
+    WARNING(Color.ANSWER, System.out),
     DEBUG(Color.BLACK_ON_WHITE, System.out);
 
     PrintStream out;
@@ -62,6 +62,10 @@ public enum Log {
     }
 
     public static void user(String message){
+        Log.INFO.out(message);
+    }
+
+    public static void warning(String message){
         Log.INFO.out(message);
     }
 

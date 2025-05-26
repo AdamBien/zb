@@ -11,12 +11,8 @@ import airhacks.zb.discovery.control.JavaFiles;
 
 public interface Compiler {
 
-  public static boolean compile(Path rootSourceDirectory,Path rootOutputDirectory) throws IOException {
-    var javaFiles =  JavaFiles.findFrom(rootSourceDirectory);
-    return compile(javaFiles, rootOutputDirectory);
-  }
-
-  static boolean compile(List<Path> javaFiles, Path outputDirectory) {
+ 
+  public static boolean compile(List<Path> javaFiles, Path outputDirectory) {
     var javac = ToolProvider.getSystemJavaCompiler();
     var fm = javac.getStandardFileManager(null, null, null);
     var cus = fm.getJavaFileObjectsFromPaths(javaFiles);
