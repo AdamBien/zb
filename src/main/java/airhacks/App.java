@@ -15,7 +15,7 @@ import static airhacks.App.Defaults.*;
  */
 interface App {
 
-    String VERSION = "zb v2025.05.26.1";
+    String VERSION = "zb v2025.05.26.2";
 
     enum Defaults {
         SOURCE_DIR("src/main/java"),
@@ -28,8 +28,12 @@ interface App {
             this.path = path;
         }
 
-        public String path() {
+        public String asString() {
             return path;
+        }
+
+        public Path asPath() {
+            return Path.of(this.path);
         }
 
     }
@@ -37,9 +41,9 @@ interface App {
     record Arguments(Path sourceDirectory, Path classesDirectory, Path jarDirectory, String jarFileName) {
         static Arguments from(String... args) {
             return new Arguments(
-                Path.of(args.length > 0 ? args[0] : SOURCE_DIR.path()),
-                Path.of(args.length > 1 ? args[1] : CLASSES_DIR.path()),
-                Path.of(args.length > 2 ? args[2] : JAR_DIR.path()),
+                Path.of(args.length > 0 ? args[0] : SOURCE_DIR.asString()),
+                Path.of(args.length > 1 ? args[1] : CLASSES_DIR.asString()),
+                Path.of(args.length > 2 ? args[2] : JAR_DIR.asString()),
                 args.length > 3 ? args[3] : "zb.jar"
             );
         }
