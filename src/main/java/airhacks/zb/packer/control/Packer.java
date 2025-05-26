@@ -28,7 +28,10 @@ public interface Packer {
         var fullyQualifiedClassName = mainClass.getFileName().toString().replace(".java", "");
         var manifest = Manifestor.manifest(fullyQualifiedClassName);
         try {
+            var entry = new JarEntry("META-INF/MANIFEST.MF");
+            jos.putNextEntry(entry);
             manifest.write(jos);
+            jos.closeEntry();
         } catch (IOException e) {
             throw new RuntimeException("Failed to add manifest to JAR: ", e);
         }
