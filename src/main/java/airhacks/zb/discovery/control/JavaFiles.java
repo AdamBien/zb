@@ -42,12 +42,20 @@ public interface JavaFiles {
     }
 
     static boolean containsMainMethod(Path path) {
-        return contentContains(path, " main(");
+        return contentContains(path, "void main(");
     }
 
     static boolean contentContains(Path path, String content) {
         try {
-            return Files.readString(path).contains(content);
+            return Files.readString(path)
+            .lines()
+            .filter(line -> line.contains(content))
+            .filter(line -> !line.startsWith("//"))
+            .filter(line -> !line.startsWith("/*"))
+            .filter(line -> !line.startsWith("/**"))
+            .filter(line -> !line.contains("\""))
+            .findAny()
+            .isPresent();
         } catch (IOException e) {
             Log.error("Failed to read file: " + path, e);
             return false;
