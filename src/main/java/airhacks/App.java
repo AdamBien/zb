@@ -22,7 +22,7 @@ interface App {
                 Path.of(args.length > 0 ? args[0] : "src/main/java"),
                 Path.of(args.length > 1 ? args[1] : "target/test/classes"),
                 Path.of(args.length > 2 ? args[2] : "target/test/jar"),
-                args.length > 3 ? args[3] : "test.jar"
+                args.length > 3 ? args[3] : "zb.jar"
             );
         }
 

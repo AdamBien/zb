@@ -1,5 +1,6 @@
 package airhacks.zb.packer.control;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,7 +27,8 @@ public interface Packer {
 
     static void addManifest(Path rootClassesDirectory, JarOutputStream jos,Path mainClass)  {
         var fqn = removeRootDirectory(rootClassesDirectory, mainClass);
-        var fullyQualifiedClassName = fqn.getFileName().toString().replace(".java", "");
+        var javaPackage =  pathToJavaPackage(fqn);
+        var fullyQualifiedClassName = javaPackage.replace(".java", "");
         var manifest = Manifestor.manifest(fullyQualifiedClassName);
         try {
             var entry = new JarEntry("META-INF/MANIFEST.MF");
@@ -36,6 +38,10 @@ public interface Packer {
         } catch (IOException e) {
             throw new RuntimeException("Failed to add manifest to JAR: ", e);
         }
+    }
+
+    static String pathToJavaPackage(Path path){
+        return path.toString().replace(File.separator, ".");
     }
 
     static Path removeRootDirectory(Path rootPath,Path classFile) {

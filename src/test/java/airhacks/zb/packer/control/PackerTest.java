@@ -28,4 +28,11 @@ public class PackerTest {
         var fqn = Packer.removeRootDirectory(rootPath, classFile);
         assertThat(fqn).isEqualTo(Path.of("airhacks","App.java"));
     }
+
+    @Test
+    void pathToJavaPackage() {
+        var path = Path.of("airhacks","App");
+        var javaPackage = Packer.pathToJavaPackage(path);
+        assertThat(javaPackage).isEqualTo("airhacks.App");
+    }
 }
