@@ -1,13 +1,10 @@
 package airhacks.zb.compiler.control;
 
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
 import javax.tools.ToolProvider;
-
-import airhacks.zb.discovery.control.JavaFiles;
 
 public interface Compiler {
 
