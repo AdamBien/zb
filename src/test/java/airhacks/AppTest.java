@@ -1,9 +1,12 @@
 package airhacks;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
+
+import airhacks.zb.packer.control.JarLoader;
 
 class AppTest {
 
@@ -40,5 +43,15 @@ class AppTest {
         assertThat(arguments.classesDirectory()).isEqualTo(Path.of("target/test/classes"));
         assertThat(arguments.jarDirectory()).isEqualTo(Path.of("target/test/jar"));
         assertThat(arguments.jarFileName()).isEqualTo("test.jar");
+    }
+
+
+    @Test
+    void createZBJar() throws IOException {
+        App.main();
+
+        var manifest = JarLoader.loadManifest(Path.of("target","test","jar","zb.jar"));
+        assertThat(manifest).isNotNull();
+        assertThat(manifest.getMainAttributes().getValue("Main-Class")).isEqualTo("airhacks.App");
     }
 } 
