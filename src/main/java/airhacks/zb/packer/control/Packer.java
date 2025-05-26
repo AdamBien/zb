@@ -25,7 +25,8 @@ public interface Packer {
     }
 
     static void addManifest(Path rootClassesDirectory, JarOutputStream jos,Path mainClass)  {
-        var fullyQualifiedClassName = mainClass.getFileName().toString().replace(".java", "");
+        var fqn = removeRootDirectory(rootClassesDirectory, mainClass);
+        var fullyQualifiedClassName = fqn.getFileName().toString().replace(".java", "");
         var manifest = Manifestor.manifest(fullyQualifiedClassName);
         try {
             var entry = new JarEntry("META-INF/MANIFEST.MF");
@@ -35,6 +36,10 @@ public interface Packer {
         } catch (IOException e) {
             throw new RuntimeException("Failed to add manifest to JAR: ", e);
         }
+    }
+
+    static Path removeRootDirectory(Path rootPath,Path classFile) {
+        return rootPath.relativize(classFile);
     }
 
     static void addEntry(Path rootClassesDirectory, JarOutputStream jos, Path relativePath, byte[] content)  {

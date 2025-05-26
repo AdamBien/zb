@@ -14,7 +14,7 @@ import airhacks.zb.packer.control.Packer;
  */
 interface App {
 
-    String VERSION = "zb v2025.05.25.2";
+    String VERSION = "zb v2025.05.26.1";
 
     record Arguments(Path sourceDirectory, Path classesDirectory, Path jarDirectory, String jarFileName) {
         static Arguments from(String... args) {

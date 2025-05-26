@@ -1,5 +1,7 @@
 package airhacks.zb.packer.control;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,5 +19,13 @@ public class PackerTest {
         try(var jos = new JarOutputStream(Files.newOutputStream(jarFile,StandardOpenOption.CREATE))){
             Packer.addManifest(outputDir,jos,mainClass);
         }
+    }
+
+    @Test
+    void removeRootDirectory() {
+        var rootPath = Path.of("src","main","java");
+        var classFile = Path.of("src","main","java","airhacks","App.java");
+        var fqn = Packer.removeRootDirectory(rootPath, classFile);
+        assertThat(fqn).isEqualTo(Path.of("airhacks","App.java"));
     }
 }
