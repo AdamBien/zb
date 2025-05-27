@@ -21,13 +21,7 @@ public class PackerTest {
         }
     }
 
-    @Test
-    void removeRootDirectory() {
-        var rootPath = Path.of("src","main","java");
-        var classFile = Path.of("src","main","java","airhacks","App.java");
-        var fqn = Packer.removeRootDirectory(rootPath, classFile);
-        assertThat(fqn).isEqualTo(Path.of("airhacks","App.java"));
-    }
+
 
     @Test
     void pathToJavaPackage() {

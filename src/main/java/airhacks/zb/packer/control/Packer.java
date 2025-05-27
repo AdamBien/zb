@@ -26,8 +26,7 @@ public interface Packer {
     }
 
     static void addManifest(Path rootClassesDirectory, JarOutputStream jos,Path mainClass)  {
-        var fqn = removeRootDirectory(rootClassesDirectory, mainClass);
-        var javaPackage =  pathToJavaPackage(fqn);
+        var javaPackage =  pathToJavaPackage(mainClass);
         var fullyQualifiedClassName = javaPackage.replace(".java", "");
         var manifest = Manifestor.manifest(fullyQualifiedClassName);
         try {
@@ -44,9 +43,7 @@ public interface Packer {
         return path.toString().replace(File.separator, ".");
     }
 
-    static Path removeRootDirectory(Path rootPath,Path classFile) {
-        return rootPath.relativize(classFile);
-    }
+
 
     static void addEntry(Path rootClassesDirectory, JarOutputStream jos, Path relativePath, byte[] content)  {
             try {
