@@ -15,7 +15,7 @@ import static airhacks.App.Defaults.*;
  */
 interface App {
 
-    String VERSION = "zb v2025.05.26.2";
+    String VERSION = "zb v2025.05.27.1";
 
     enum Defaults {
         SOURCE_DIR("src/main/java"),
@@ -53,11 +53,15 @@ interface App {
     }
 
     static void build(Arguments arguments) throws IOException {
-        var javaFiles = JavaFiles.findFrom(arguments.sourceDirectory());
+        var sourceDirectory = arguments.sourceDirectory();
+        var javaFiles = JavaFiles.findFrom(sourceDirectory);
         Compiler.compile(javaFiles, arguments.classesDirectory());
         var mainClass = JavaFiles.findMainClass(javaFiles);
+
         Log.debug("main class: " + mainClass);
-        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName(), mainClass);
+        var relativeMainClass = mainClass.map(p-> sourceDirectory.relativize(p));
+
+        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName(), relativeMainClass);
     }
     
     static void main(String... args) throws IOException {
