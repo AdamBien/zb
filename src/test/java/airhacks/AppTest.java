@@ -17,7 +17,7 @@ class AppTest {
         assertThat(arguments.sourceDirectory()).isEqualTo(Path.of("src/main/java"));
         assertThat(arguments.classesDirectory()).isEqualTo(Path.of("target/test/classes"));
         assertThat(arguments.jarDirectory()).isEqualTo(Path.of("target/test/jar"));
-        assertThat(arguments.jarFileName()).isEqualTo("test.jar");
+        assertThat(arguments.jarFileName()).isEqualTo("zb.jar");
     }
 
     @Test
@@ -42,7 +42,7 @@ class AppTest {
         assertThat(arguments.sourceDirectory()).isEqualTo(Path.of("custom/src"));
         assertThat(arguments.classesDirectory()).isEqualTo(Path.of("target/test/classes"));
         assertThat(arguments.jarDirectory()).isEqualTo(Path.of("target/test/jar"));
-        assertThat(arguments.jarFileName()).isEqualTo("test.jar");
+        assertThat(arguments.jarFileName()).isEqualTo("zb.jar");
     }
 
 
