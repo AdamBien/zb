@@ -1,5 +1,6 @@
 package airhacks;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import airhacks.zb.compiler.control.Compiler;
@@ -54,7 +55,24 @@ interface App {
 
     static void build(Arguments arguments) throws IOException {
         var sourceDirectory = arguments.sourceDirectory();
+        
+        // Check if source directory exists
+        if (!Files.exists(sourceDirectory)) {
+            Log.error("❌ Source directory not found: " + sourceDirectory.toAbsolutePath(), null);
+            Log.user("💡 Please ensure the source directory exists or specify a different path.");
+            Log.user("   Usage: java -jar zb.jar [source-dir] [classes-dir] [jar-dir] [jar-name]");
+            Log.user("   Example: java -jar zb.jar src/main/java target/classes target myapp.jar");
+            System.exit(1);
+        }
+        
         var javaFiles = JavaFiles.findFrom(sourceDirectory);
+        
+        if (javaFiles.isEmpty()) {
+            Log.warning("⚠️  No Java files found in: " + sourceDirectory.toAbsolutePath());
+            Log.user("💡 Please check if the directory contains .java files.");
+            System.exit(1);
+        }
+        
         Compiler.compile(javaFiles, arguments.classesDirectory());
         var mainClass = JavaFiles.findMainClass(javaFiles);
 

@@ -16,6 +16,9 @@ public interface JavaFiles {
                     .filter(Files::isRegularFile)
                     .filter(path -> path.toString().endsWith(".java"))
                     .toList();
+        } catch (IOException e) {
+            Log.error("❌ Failed to read directory: " + rootDir.toAbsolutePath(), e);
+            throw new IOException("Unable to access directory: " + rootDir + ". " + e.getMessage(), e);
         }
     }
 
