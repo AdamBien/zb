@@ -45,10 +45,9 @@ public interface Packer {
 
 
 
-    static void addEntry(Path rootClassesDirectory, JarOutputStream jos, Path relativePath, byte[] content)  {
+    static void addEntry(JarOutputStream jos, Path relativePath, byte[] content)  {
             try {
-                var path = rootClassesDirectory.relativize(relativePath);
-                var entry = new JarEntry(path.toString());
+                var entry = new JarEntry(relativePath.toString());
                 jos.putNextEntry(entry);
                 jos.write(content);
                 jos.closeEntry();
@@ -63,7 +62,7 @@ public interface Packer {
         var relativePath = rootClassesDirectory.relativize(path);
         try {
             var content = Files.readAllBytes(path);
-            addEntry(rootClassesDirectory, jarOutputStream, relativePath, content);
+            addEntry(jarOutputStream, relativePath, content);
         } catch (IOException e) {
             throw new RuntimeException("Failed to add file to JAR: " + path, e);
         }

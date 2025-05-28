@@ -15,7 +15,7 @@ import static airhacks.App.Defaults.*;
  */
 interface App {
 
-    String VERSION = "zb v2025.05.27.1";
+    String VERSION = "zb v2025.05.28.1";
 
     enum Defaults {
         SOURCE_DIR("src/main/java"),
