@@ -1,20 +1,24 @@
-package airhacks.zb.hint.boundary;
+package airhacks.zb.hints.boundary;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import airhacks.zb.log.boundary.Log;
 
 public interface UserHint {
 
-    static void showHint(Path sourceDirectory, List<Path> javaFiles) {
+    static void showHint(Path sourceDirectory, List<Path> javaFiles, Optional<Path> mainClass) {
         
         if (!Files.exists(sourceDirectory)) {
             sourceDirectoryNotFound(sourceDirectory);
         }
         if (javaFiles.isEmpty()) {
             noJavaFilesFound(sourceDirectory);
+        }
+        if (mainClass.isEmpty()) {
+            noMainClassFound();
         }
     }
 

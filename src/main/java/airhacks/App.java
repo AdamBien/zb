@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 import airhacks.zb.compiler.control.Compiler;
 import airhacks.zb.discovery.control.JavaFiles;
-import airhacks.zb.hint.boundary.UserHint;
+import airhacks.zb.hints.boundary.UserHint;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
 import static airhacks.App.Defaults.*;
@@ -61,7 +61,7 @@ interface App {
         var javaFiles = JavaFiles.findFrom(sourceDirectory);
         var mainClass = JavaFiles.findMainClass(javaFiles);
 
-        UserHint.showHint(sourceDirectory, javaFiles);
+        UserHint.showHint(sourceDirectory, javaFiles, mainClass);
 
         Compiler.compile(javaFiles, arguments.classesDirectory());
 
