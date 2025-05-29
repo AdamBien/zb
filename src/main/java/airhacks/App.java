@@ -6,6 +6,7 @@ import java.nio.file.Path;
 
 import airhacks.zb.compiler.control.Compiler;
 import airhacks.zb.discovery.control.JavaFiles;
+import airhacks.zb.hint.boundary.UserHint;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
 import static airhacks.App.Defaults.*;
@@ -16,7 +17,7 @@ import static airhacks.App.Defaults.*;
  */
 interface App {
 
-    String VERSION = "zb v2025.05.28.1";
+    String VERSION = "zb v2025.05.29.1";
 
     enum Defaults {
         SOURCE_DIR("src/main/java"),
@@ -57,11 +58,12 @@ interface App {
 
     static void build(Arguments arguments) throws IOException {
         var sourceDirectory = arguments.sourceDirectory();
-
         var javaFiles = JavaFiles.findFrom(sourceDirectory);
+        var mainClass = JavaFiles.findMainClass(javaFiles);
+
+        UserHint.showHint(sourceDirectory, javaFiles);
 
         Compiler.compile(javaFiles, arguments.classesDirectory());
-        var mainClass = JavaFiles.findMainClass(javaFiles);
 
         Log.debug("main class: " + mainClass);
         var relativeMainClass = mainClass.map(p -> sourceDirectory.relativize(p));

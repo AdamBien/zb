@@ -1,11 +1,22 @@
 package airhacks.zb.hint.boundary;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+
 import airhacks.zb.log.boundary.Log;
 
 public interface UserHint {
 
-    
+    static void showHint(Path sourceDirectory, List<Path> javaFiles) {
+        
+        if (!Files.exists(sourceDirectory)) {
+            sourceDirectoryNotFound(sourceDirectory);
+        }
+        if (javaFiles.isEmpty()) {
+            noJavaFilesFound(sourceDirectory);
+        }
+    }
 
     static void sourceDirectoryNotFound(Path sourceDirectory) {
         Log.error("❌ Source directory not found: " + sourceDirectory.toAbsolutePath(), null);
