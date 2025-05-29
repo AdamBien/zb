@@ -1,4 +1,5 @@
 package airhacks;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -8,7 +9,6 @@ import airhacks.zb.discovery.control.JavaFiles;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
 import static airhacks.App.Defaults.*;
-
 
 /**
  *
@@ -42,46 +42,34 @@ interface App {
     record Arguments(Path sourceDirectory, Path classesDirectory, Path jarDirectory, String jarFileName) {
         static Arguments from(String... args) {
             return new Arguments(
-                Path.of(args.length > 0 ? args[0] : SOURCE_DIR.asString()),
-                Path.of(args.length > 1 ? args[1] : CLASSES_DIR.asString()),
-                Path.of(args.length > 2 ? args[2] : JAR_DIR.asString()),
-                args.length > 3 ? args[3] : "zb.jar"
-            );
+                    Path.of(args.length > 0 ? args[0] : SOURCE_DIR.asString()),
+                    Path.of(args.length > 1 ? args[1] : CLASSES_DIR.asString()),
+                    Path.of(args.length > 2 ? args[2] : JAR_DIR.asString()),
+                    args.length > 3 ? args[3] : "zb.jar");
         }
 
-        public void userInfo() { Log.user("🔍 source: " + sourceDirectory + ", classes: " + classesDirectory + ", JAR dir: " + jarDirectory + ", JAR file: " + jarFileName); }
-            
+        public void userInfo() {
+            Log.user("🔍 source: " + sourceDirectory + ", classes: " + classesDirectory + ", JAR dir: " + jarDirectory
+                    + ", JAR file: " + jarFileName);
+        }
+
     }
 
     static void build(Arguments arguments) throws IOException {
         var sourceDirectory = arguments.sourceDirectory();
-        
-        // Check if source directory exists
-        if (!Files.exists(sourceDirectory)) {
-            Log.error("❌ Source directory not found: " + sourceDirectory.toAbsolutePath(), null);
-            Log.user("💡 Please ensure the source directory exists or specify a different path.");
-            Log.user("   Usage: java -jar zb.jar [source-dir] [classes-dir] [jar-dir] [jar-name]");
-            Log.user("   Example: java -jar zb.jar src/main/java target/classes target myapp.jar");
-            System.exit(1);
-        }
-        
+
         var javaFiles = JavaFiles.findFrom(sourceDirectory);
-        
-        if (javaFiles.isEmpty()) {
-            Log.warning("⚠️  No Java files found in: " + sourceDirectory.toAbsolutePath());
-            Log.user("💡 Please check if the directory contains .java files.");
-            System.exit(1);
-        }
-        
+
         Compiler.compile(javaFiles, arguments.classesDirectory());
         var mainClass = JavaFiles.findMainClass(javaFiles);
 
         Log.debug("main class: " + mainClass);
-        var relativeMainClass = mainClass.map(p-> sourceDirectory.relativize(p));
+        var relativeMainClass = mainClass.map(p -> sourceDirectory.relativize(p));
 
-        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName(), relativeMainClass);
+        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName(),
+                relativeMainClass);
     }
-    
+
     static void main(String... args) throws IOException {
         Log.user("🚀 " + VERSION + " - fast and pure Java 🛠️");
         var arguments = Arguments.from(args);
