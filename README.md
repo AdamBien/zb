@@ -2,7 +2,24 @@
 
 zb was built using only Java 21 functionality.
 
-# Build
+# Build from Source
+
+## Prerequisites
+- Java 21 or later
+
+
+```bash
+# Clone the repository
+git clone https://github.com/[username]/zb.git
+cd zb
+
+# Build with Maven
+mvn clean package
+
+# The executable JAR will be in targetzb.jar
+# Copy it to your desired location
+cp targetzb.jar ~/bin/zb.jar
+```
 
 
 ## Basic Usage
@@ -32,6 +49,3 @@ java -jar zb.jar src/main/java target/classes target/jar myapp.jar
 - Detects main class automatically
 - Compiles all Java files
 - Packages into executable JAR with manifest
-
-
-
