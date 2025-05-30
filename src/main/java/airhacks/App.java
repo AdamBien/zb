@@ -17,12 +17,12 @@ import static airhacks.App.Defaults.*;
  */
 interface App {
 
-    String VERSION = "zb v2025.05.30.2";
+    String VERSION = "zb v2025.05.30.3";
 
     enum Defaults {
         SOURCE_DIR("src/main/java"),
         CLASSES_DIR("zb/classes"),
-        JAR_DIR("zb/jar");
+        JAR_DIR("zb/");
 
         private final String path;
 
@@ -65,7 +65,6 @@ interface App {
 
         Compiler.compile(javaFiles, arguments.classesDirectory());
 
-        Log.debug("main class: " + mainClass);
         var relativeMainClass = mainClass.map(p -> sourceDirectory.relativize(p));
 
         Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName(),
