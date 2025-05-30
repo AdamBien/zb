@@ -1,4 +1,4 @@
-#zb (Zero Dependencies Build)
+# zb (Zero Dependencies Build)
 
 zb was built using only Java 21 functionality.
 
