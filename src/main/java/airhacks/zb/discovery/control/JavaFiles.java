@@ -20,6 +20,7 @@ public interface JavaFiles {
         } catch (IOException e) {
             Log.error("❌ Failed to read directory: " + rootDir.toAbsolutePath(), e);
             UserHint.directoryAccessError(rootDir, e);
+            return List.of();
         }
     }
 
