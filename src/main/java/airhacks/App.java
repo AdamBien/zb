@@ -21,8 +21,8 @@ interface App {
 
     enum Defaults {
         SOURCE_DIR("src/main/java"),
-        CLASSES_DIR("target/test/classes"),
-        JAR_DIR("target/test/jar");
+        CLASSES_DIR("zb/classes"),
+        JAR_DIR("zb/jar");
 
         private final String path;
 
