@@ -36,7 +36,7 @@ public interface UserHint {
 
     static void directoryAccessError(Path directory, Exception e) {
         Log.error("❌ Failed to read directory: " + directory.toAbsolutePath(), e);
-        Log.user("💡 Please check if you have read permissions for this directory.");
+        System.exit(0);
     }
 
     static void noMainClassFound() {
