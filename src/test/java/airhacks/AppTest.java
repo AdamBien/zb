@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 import airhacks.zb.packer.control.JarLoader;
+import static airhacks.App.Defaults.*;
 
 class AppTest {
 
@@ -14,9 +15,9 @@ class AppTest {
     void argumentsWithDefaultValues() {
         var arguments = App.Arguments.from();
         
-        assertThat(arguments.sourceDirectory()).isEqualTo(Path.of("src/main/java"));
-        assertThat(arguments.classesDirectory()).isEqualTo(Path.of("target/test/classes"));
-        assertThat(arguments.jarDirectory()).isEqualTo(Path.of("target/test/jar"));
+        assertThat(arguments.sourceDirectory()).isEqualTo(SOURCE_DIR.asPath());
+        assertThat(arguments.classesDirectory()).isEqualTo(CLASSES_DIR.asPath());
+        assertThat(arguments.jarDirectory()).isEqualTo(JAR_DIR.asPath());
         assertThat(arguments.jarFileName()).isEqualTo("zb.jar");
     }
 
@@ -40,8 +41,8 @@ class AppTest {
         var arguments = App.Arguments.from("custom/src");
         
         assertThat(arguments.sourceDirectory()).isEqualTo(Path.of("custom/src"));
-        assertThat(arguments.classesDirectory()).isEqualTo(Path.of("target/test/classes"));
-        assertThat(arguments.jarDirectory()).isEqualTo(Path.of("target/test/jar"));
+        assertThat(arguments.classesDirectory()).isEqualTo(CLASSES_DIR.asPath());
+        assertThat(arguments.jarDirectory()).isEqualTo(JAR_DIR.asPath());
         assertThat(arguments.jarFileName()).isEqualTo("zb.jar");
     }
 
@@ -50,7 +51,7 @@ class AppTest {
     void createZBJar() throws IOException {
         App.main();
 
-        var manifest = JarLoader.loadManifest(Path.of("target","test","jar","zb.jar"));
+        var manifest = JarLoader.loadManifest(Path.of(JAR_DIR.asString(),"zb.jar"));
         assertThat(manifest).isNotNull();
         assertThat(manifest.getMainAttributes().getValue("Main-Class")).isEqualTo("airhacks.App");
     }
