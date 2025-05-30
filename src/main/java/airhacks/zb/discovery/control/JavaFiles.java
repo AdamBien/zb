@@ -6,11 +6,12 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import airhacks.zb.hints.boundary.UserHint;
 import airhacks.zb.log.boundary.Log;
 
 public interface JavaFiles {
 
-    static List<Path> findFrom(Path rootDir) throws IOException {
+    static List<Path> findFrom(Path rootDir) {
         try (var paths = Files.walk(rootDir)) {
             return paths
                     .filter(Files::isRegularFile)
@@ -18,7 +19,7 @@ public interface JavaFiles {
                     .toList();
         } catch (IOException e) {
             Log.error("❌ Failed to read directory: " + rootDir.toAbsolutePath(), e);
-            throw new IOException("Unable to access directory: " + rootDir + ". " + e.getMessage(), e);
+            UserHint.directoryAccessError(rootDir, e);
         }
     }
 
