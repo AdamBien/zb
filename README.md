@@ -16,9 +16,9 @@ cd zb
 # Build with Maven
 mvn clean package
 
-# The executable JAR will be in targetzb.jar
+# The executable JAR will be in targe/zb.jar
 # Copy it to your desired location
-cp targetzb.jar ~/bin/zb.jar
+cp target/zb.jar ~/bin/zb.jar
 ```
 
 
