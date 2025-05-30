@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
+import airhacks.App.Defaults;
 import airhacks.zb.packer.control.JarLoader;
 import static airhacks.App.Defaults.*;
 
@@ -18,7 +19,7 @@ class AppTest {
         assertThat(arguments.sourceDirectory()).isEqualTo(SOURCE_DIR.asPath());
         assertThat(arguments.classesDirectory()).isEqualTo(CLASSES_DIR.asPath());
         assertThat(arguments.jarDirectory()).isEqualTo(JAR_DIR.asPath());
-        assertThat(arguments.jarFileName()).isEqualTo("zb.jar");
+        assertThat(arguments.jarFileName()).isEqualTo(Defaults.JAR_FILE_NAME);
     }
 
     @Test
@@ -43,7 +44,7 @@ class AppTest {
         assertThat(arguments.sourceDirectory()).isEqualTo(Path.of("custom/src"));
         assertThat(arguments.classesDirectory()).isEqualTo(CLASSES_DIR.asPath());
         assertThat(arguments.jarDirectory()).isEqualTo(JAR_DIR.asPath());
-        assertThat(arguments.jarFileName()).isEqualTo("zb.jar");
+        assertThat(arguments.jarFileName()).isEqualTo(Defaults.JAR_FILE_NAME);
     }
 
 
@@ -51,7 +52,7 @@ class AppTest {
     void createZBJar() throws IOException {
         App.main();
 
-        var manifest = JarLoader.loadManifest(Path.of(JAR_DIR.asString(),"zb.jar"));
+        var manifest = JarLoader.loadManifest(Path.of(JAR_DIR.asString(),Defaults.JAR_FILE_NAME));
         assertThat(manifest).isNotNull();
         assertThat(manifest.getMainAttributes().getValue("Main-Class")).isEqualTo("airhacks.App");
     }
