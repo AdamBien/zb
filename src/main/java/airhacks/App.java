@@ -1,7 +1,11 @@
 package airhacks;
 
+import static airhacks.App.Defaults.CLASSES_DIR;
+import static airhacks.App.Defaults.JAR_DIR;
+import static airhacks.App.Defaults.JAR_FILE_NAME;
+import static airhacks.App.Defaults.SOURCE_DIR;
+
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import airhacks.zb.compiler.control.Compiler;
@@ -9,13 +13,12 @@ import airhacks.zb.discovery.control.JavaFiles;
 import airhacks.zb.hints.boundary.UserHint;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
-import static airhacks.App.Defaults.*;
 
 /**
  *
  * @author airhacks.com
  */
-interface App {
+public interface App {
 
     String VERSION = "zb v2025.05.30.3";
 
@@ -23,6 +26,8 @@ interface App {
         SOURCE_DIR("src/main/java"),
         CLASSES_DIR("zb/classes"),
         JAR_DIR("zb/");
+
+        public static final String JAR_FILE_NAME = "app.jar";
 
         private final String path;
 
@@ -46,7 +51,7 @@ interface App {
                     Path.of(args.length > 0 ? args[0] : SOURCE_DIR.asString()),
                     Path.of(args.length > 1 ? args[1] : CLASSES_DIR.asString()),
                     Path.of(args.length > 2 ? args[2] : JAR_DIR.asString()),
-                    args.length > 3 ? args[3] : "zb.jar");
+                    args.length > 3 ? args[3] : JAR_FILE_NAME);
         }
 
         public void userInfo() {
