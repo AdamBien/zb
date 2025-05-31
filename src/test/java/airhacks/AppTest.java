@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 
 import airhacks.App.Defaults;
-import airhacks.zb.discovery.control.SourceLocation;
+import airhacks.zb.discovery.control.SourceLocator;
 import airhacks.zb.packer.control.JarLoader;
 import static airhacks.App.Defaults.*;
 
@@ -17,7 +17,7 @@ class AppTest {
     void argumentsWithDefaultValues() {
         var arguments = App.Arguments.from();
         
-        assertThat(arguments.sourceDirectory()).isEqualTo(SourceLocation.detectSourceDirectory().orElseThrow());
+        assertThat(arguments.sourceDirectory()).isEqualTo(SourceLocator.detectSourceDirectory().orElseThrow());
         assertThat(arguments.classesDirectory()).isEqualTo(CLASSES_DIR.asPath());
         assertThat(arguments.jarDirectory()).isEqualTo(JAR_DIR.asPath());
         assertThat(arguments.jarFileName()).isEqualTo(Defaults.JAR_FILE_NAME);

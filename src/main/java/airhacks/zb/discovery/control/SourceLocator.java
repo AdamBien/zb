@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-public interface SourceLocation {
+public interface SourceLocator {
 
     List<String> candidates = List.of("src/main/java", "src/", ".");
 
@@ -18,7 +18,7 @@ public interface SourceLocation {
         return candidates
                 .stream()
                 .map(rootDir::resolve)
-                .filter(SourceLocation::directoryExists)
+                .filter(SourceLocator::directoryExists)
                 .findFirst();
     }
 

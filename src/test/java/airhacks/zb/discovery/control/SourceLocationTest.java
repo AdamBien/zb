@@ -9,7 +9,7 @@ public class SourceLocationTest {
 
     @Test
     public void sourcesInTheRootDirectory() {
-        var sourceDirectory = SourceLocation.detectSourceDirectory(Path.of("."));
+        var sourceDirectory = SourceLocator.detectSourceDirectory(Path.of("."));
         assertThat(sourceDirectory).isPresent();
         assertThat(sourceDirectory.get().toString()).endsWith("src/main/java");
     }

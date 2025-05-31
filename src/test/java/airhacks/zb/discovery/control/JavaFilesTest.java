@@ -11,7 +11,7 @@ public class JavaFilesTest {
 
     @Test
     void findMain() {
-        var src = SourceLocation.detectSourceDirectory().orElseThrow();
+        var src = SourceLocator.detectSourceDirectory().orElseThrow();
         var javaFiles = JavaFiles.findFrom(src);
         var mainClasses = JavaFiles.findMain(javaFiles);
         System.out.println(mainClasses);

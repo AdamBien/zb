@@ -9,7 +9,7 @@ import java.nio.file.Path;
 
 import airhacks.zb.compiler.control.Compiler;
 import airhacks.zb.discovery.control.JavaFiles;
-import airhacks.zb.discovery.control.SourceLocation;
+import airhacks.zb.discovery.control.SourceLocator;
 import airhacks.zb.hints.boundary.UserHint;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
@@ -47,7 +47,7 @@ public interface App {
     record Arguments(Path sourceDirectory, Path classesDirectory, Path jarDirectory, String jarFileName) {
         static Arguments from(String... args) {
             return new Arguments(
-                    args.length > 0 ? Path.of(args[0]) : SourceLocation.detectSourceDirectory().orElseThrow(),
+                    args.length > 0 ? Path.of(args[0]) : SourceLocator.detectSourceDirectory().orElseThrow(),
                     Path.of(args.length > 1 ? args[1] : CLASSES_DIR.asString()),
                     Path.of(args.length > 2 ? args[2] : JAR_DIR.asString()),
                     args.length > 3 ? args[3] : JAR_FILE_NAME);
