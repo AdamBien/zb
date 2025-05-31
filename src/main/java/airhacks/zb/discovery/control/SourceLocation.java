@@ -9,6 +9,11 @@ public interface SourceLocation {
 
     List<String> candidates = List.of("src/main/java", "src/", ".");
 
+    static Optional<Path> detectSourceDirectory() {
+        var currentDir = Path.of(".");
+        return detectSourceDirectory(currentDir);
+    }
+
     static Optional<Path> detectSourceDirectory(Path rootDir) {
         return candidates
                 .stream()
