@@ -20,11 +20,11 @@ import airhacks.zb.packer.control.Packer;
  */
 public interface App {
 
-    String VERSION = "zb v2025.05.31.1";
+    String VERSION = "zb v2025.05.31.2";
 
     enum Defaults {
         SOURCE_DIR("src/main/java"),
-        CLASSES_DIR("zb/classes"),
+        CLASSES_DIR("zbo/classes"),
         JAR_DIR("zbo/");
 
         public static final String JAR_FILE_NAME = "app.jar";
