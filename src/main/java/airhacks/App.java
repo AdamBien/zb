@@ -55,8 +55,7 @@ public interface App {
         }
 
         public void userInfo() {
-            Log.user("🔍 source: " + sourceDirectory + ", classes: " + classesDirectory + ", JAR dir: " + jarDirectory
-                    + ", JAR file: " + jarFileName);
+            Log.user("🔍 source: %s , JAR dir: %s, JAR file: %s".formatted(sourceDirectory,jarDirectory,jarFileName));
         }
 
     }
