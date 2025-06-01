@@ -18,9 +18,9 @@ public interface Cleaner {
         }
     }
 
-    static void deleteFile(Path path) {
+    static boolean deleteFile(Path path) {
         try {
-            Files.delete(path);
+            return Files.deleteIfExists(path);
         } catch (IOException e) {
             throw new RuntimeException("Failed to delete: " + path, e);
         }
