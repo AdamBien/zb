@@ -1,5 +1,6 @@
 package airhacks.zb.hints.boundary;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -48,5 +49,9 @@ public interface UserHint {
         Log.warning("⚠️  Multiple main classes found.");
         Log.user("💡 The build tool found multiple classes with main methods.");
         Log.user("   Consider having only one main class in your project.");
+    }
+
+    static void error(String message, Exception e) {
+        Log.error("❌ " + message, e);
     }
 } 
