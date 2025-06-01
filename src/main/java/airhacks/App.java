@@ -7,6 +7,7 @@ import static airhacks.App.Defaults.JAR_FILE_NAME;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import airhacks.zb.cleanup.control.Cleaner;
 import airhacks.zb.compiler.control.Compiler;
 import airhacks.zb.discovery.control.JavaFiles;
 import airhacks.zb.discovery.control.SourceLocator;
@@ -20,7 +21,7 @@ import airhacks.zb.packer.control.Packer;
  */
 public interface App {
 
-    String VERSION = "zb v2025.05.31.3";
+    String VERSION = "zb v2025.06.01.1";
 
     enum Defaults {
         CLASSES_DIR("zbo/classes"),
@@ -64,15 +65,16 @@ public interface App {
         var sourceDirectory = arguments.sourceDirectory();
         var javaFiles = JavaFiles.findFrom(sourceDirectory);
         var mainClass = JavaFiles.findMainClass(javaFiles);
-
+        var classesDirectory = arguments.classesDirectory();
         UserHint.showHint(sourceDirectory, javaFiles, mainClass);
 
-        Compiler.compile(javaFiles, arguments.classesDirectory());
+        Compiler.compile(javaFiles, classesDirectory);
 
         var relativeMainClass = mainClass.map(p -> sourceDirectory.relativize(p));
 
-        Packer.archive(arguments.classesDirectory(), arguments.jarDirectory(), arguments.jarFileName(),
+        Packer.archive(classesDirectory, arguments.jarDirectory(), arguments.jarFileName(),
                 relativeMainClass);
+        Cleaner.cleanClasses(classesDirectory);
     }
 
     static void main(String... args) throws IOException {
