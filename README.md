@@ -1,12 +1,24 @@
 # zb (Zero Dependencies Build)
 
-zb was built using only Java 21 functionality.
+A lightweight Java build tool that requires zero external dependencies. Built using pure Java 21 functionality.
 
-# Build from Source
+## Features
+
+- 🚀 Zero external dependencies
+- ⚡ Fast compilation and packaging
+- 🔍 Automatic main class detection
+- 📦 Executable JAR generation
+- 🎯 Simple and intuitive usage
+- 💻 Cross-platform compatibility
 
 ## Prerequisites
-- Java 21 or later
 
+- Java 21 or later
+- Git (for cloning the repository)
+
+## Installation
+
+### Build from Source
 
 ```bash
 # Clone the repository
@@ -16,13 +28,14 @@ cd zb
 # Build with Maven
 mvn clean package
 
-# The executable JAR will be in targe/zb.jar
+# The executable JAR will be in target/zb.jar
 # Copy it to your desired location
 cp target/zb.jar ~/bin/zb.jar
 ```
 
+## Usage
 
-## Basic Usage
+### Basic Usage
 
 ```bash
 # Compile and package with defaults
@@ -38,14 +51,18 @@ java -jar zb.jar src/main/java target/classes target/jar
 java -jar zb.jar src/main/java target/classes target/jar myapp.jar
 ```
 
-## Default Directories
-- Source: `src/main/java`
-- Classes: `zb/classes`
-- JAR output: `zb/jar`
-- JAR filename: `zb.jar`
+### Default Configuration
 
-## Features
-- Automatically discovers all Java files in source directory
-- Detects main class automatically
-- Compiles all Java files
-- Packages into executable JAR with manifest
+| Parameter | Default Value |
+|-----------|---------------|
+| Source Directory | `src/main/java` |
+| Classes Directory | `zb/classes` |
+| JAR Output Directory | `zb/jar` |
+| JAR Filename | `zb.jar` |
+
+## How It Works
+
+1. **Source Discovery**: Automatically finds all Java files in the source directory
+2. **Main Class Detection**: Identifies the main class for the executable JAR
+3. **Compilation**: Compiles all Java files to bytecode
+4. **Packaging**: Creates an executable JAR with proper manifest
