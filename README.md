@@ -2,6 +2,9 @@
 
 A lightweight Java build tool that requires zero external dependencies. Built using pure Java 21 functionality.
 
+![Duke Builder](dukebuilder.png)
+
+
 ## Features
 
 - 🚀 Zero external dependencies
