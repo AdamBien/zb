@@ -14,6 +14,7 @@ import airhacks.zb.discovery.control.SourceLocator;
 import airhacks.zb.hints.boundary.UserHint;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
+import airhacks.zb.stopwatch.control.StopWatch;
 
 /**
  *
@@ -21,7 +22,7 @@ import airhacks.zb.packer.control.Packer;
  */
 public interface App {
 
-    String VERSION = "zb v2025.06.01.1";
+    String VERSION = "zb v2025.06.03.1";
 
     enum Defaults {
         CLASSES_DIR("zbo/classes"),
@@ -80,6 +81,8 @@ public interface App {
         Log.user("🚀 " + VERSION + " - fast and pure Java 🛠️");
         var arguments = Arguments.from(args);
         arguments.userInfo();
+        var stopWatch = StopWatch.start();
         build(arguments);
+        stopWatch.stop();
     }
 }
