@@ -1,32 +1,30 @@
 package airhacks.zb.log.boundary;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 public enum Log {
 
-    ERROR(Color.RED, System.err),
+    ERROR(Color.BRIGHT_RED, System.err),
     PROMPT(Color.PROMPT, System.out),
-    INFO(Color.INFO, System.out),
-    SYSTEM(Color.DARKBLUE, System.out),
-    WARNING(Color.ANSWER, System.out),
+    INFO(Color.WARM_YELLOW, System.out),
+    SYSTEM(Color.BRIGHT_BLUE, System.out),
+    WARNING(Color.BRIGHT_WHITE, System.out),
     DEBUG(Color.BLACK_ON_WHITE, System.out);
 
     PrintStream out;
 
     enum Color {
-        PROMPT("\033[0;90m"),
-        INFO("\033[0;33m"),
-        DARKBLUE("\033[2;34m"),
-        ANSWER("\033[0;97m"),
-        RED("\033[0;41m"),
-        GREEN("\033[0;42m"),
-        YELLOW("\033[0;43m"),
-        BLUE("\033[0;44m"),
-        PURPLE("\033[0;45m"),
-        CYAN("\033[0;46m"),
-        WHITE("\033[0;47m"),
-        BLACK_ON_WHITE("\u001B[30;107m");
+        PROMPT("\033[38;5;246m"),      // Soft gray
+        WARM_YELLOW("\033[38;5;220m"),        // Warm yellow
+        BRIGHT_BLUE("\033[38;5;33m"),     // Bright blue
+        BRIGHT_WHITE("\033[38;5;255m"),      // Bright white
+        BRIGHT_RED("\033[38;5;196m"),         // Bright red
+        BRIGHT_GREEN("\033[38;5;46m"),        // Bright green
+        BRIGHT_YELLOW("\033[38;5;226m"),      // Bright yellow
+        SKY_BLUE("\033[38;5;39m"),         // Sky blue
+        SOFT_PURPLE("\033[38;5;129m"),      // Soft purple
+        BRIGHT_CYAN("\033[38;5;51m"),         // Bright cyan
+        BLACK_ON_WHITE("\033[38;5;232;48;5;255m");  // Black text on white background
 
         String code;
 
@@ -52,9 +50,8 @@ public enum Log {
         this.out.println(colored);
     }
 
-
     public static void debug(String message) {
-            Log.DEBUG.out(message);
+        Log.DEBUG.out(message);
     }
 
     public static void error(String message, Exception e) {
@@ -68,5 +65,4 @@ public enum Log {
     public static void warning(String message){
         Log.INFO.out(message);
     }
-
 }
