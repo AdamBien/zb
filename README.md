@@ -1,4 +1,4 @@
-# zb (Zero Dependencies Build)
+# zb (Zero Dependencies Builder)
 
 A lightweight Java build tool that requires zero external dependencies. Built using pure Java 21 functionality.
 
