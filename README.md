@@ -12,7 +12,6 @@ A lightweight Java build tool that requires zero external dependencies. Built us
 - 🔍 Automatic main class detection
 - 📦 Executable JAR generation
 - 🎯 Simple and intuitive usage
-- 💻 Cross-platform compatibility
 
 ## Prerequisites
 
@@ -58,10 +57,10 @@ java -jar zb.jar src/main/java target/classes target/jar myapp.jar
 
 | Parameter | Default Value |
 |-----------|---------------|
-| Source Directory | `src/main/java` |
-| Classes Directory | `zb/classes` |
-| JAR Output Directory | `zb/jar` |
-| JAR Filename | `zb.jar` |
+| Source Directory | `src/main/java`, `src` or current directory |
+| Classes Directory | `zbo/classes` |
+| JAR Output Directory | `zbo` |
+| JAR Filename | `app.jar` |
 
 ## How It Works
 

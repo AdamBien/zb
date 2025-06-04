@@ -14,6 +14,7 @@ public record StopWatch(Instant begin) {
     public void stop() {
         var end = Instant.now();
         var duration = Duration.between(this.begin, end);
-        Log.user("🕒 %s".formatted(duration));
+        var message = "🕒 %ds %dms".formatted(duration.toSeconds(), duration.toMillisPart());
+        Log.user(message);
     }
 }
