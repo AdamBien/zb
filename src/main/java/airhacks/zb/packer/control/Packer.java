@@ -9,9 +9,13 @@ import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
+/**
+ * https://docs.oracle.com/javase/8/docs/technotes/guides/jar/jar.html
+ * JAR file creator
+ */
 public interface Packer {
 
-    static void archive(Path rootClassesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass) throws IOException {
+    static void archive(Path rootClassesDirectory, Optional<Path> rootResourcesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass) throws IOException {
         var jarFile = rootJARDirectory.resolve(jarFileName);
         Files.createDirectories(rootJARDirectory);
         Files.deleteIfExists(jarFile);
@@ -19,13 +23,18 @@ public interface Packer {
         try (var fos = Files.newOutputStream(jarFile, StandardOpenOption.CREATE_NEW);
              var jos = new JarOutputStream(fos)) {
             
-            // Add manifest first if main class is present
             mainClass.ifPresent(mc -> addManifest(rootClassesDirectory, jos, mc));
             
-            // Then add all class files
             try (var paths = Files.walk(rootClassesDirectory)) {
                 paths.filter(path -> path.toString().endsWith(".class"))
                      .forEach(path -> addEntry(rootClassesDirectory, jos, path));
+            }   
+            if(rootResourcesDirectory.isPresent()) {
+                var dir = rootResourcesDirectory.get();
+                try (var paths = Files.walk(dir)) {
+                    paths.filter(Files::isRegularFile)
+                         .forEach(path -> addEntry(dir, jos, path));
+                }
             }
         }
     }
