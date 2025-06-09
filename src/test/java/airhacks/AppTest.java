@@ -2,6 +2,7 @@ package airhacks;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ class AppTest {
     void argumentsWithDefaultValues() {
         var arguments = App.Arguments.from();
         
-        assertThat(arguments.sourceDirectory()).isEqualTo(SourceLocator.detectSourceDirectory().orElseThrow());
+        assertThat(arguments.sourcesDirectory()).isEqualTo(SourceLocator.detectSourceDirectory().orElseThrow());
         assertThat(arguments.classesDirectory()).isEqualTo(CLASSES_DIR.asPath());
         assertThat(arguments.jarDirectory()).isEqualTo(JAR_DIR.asPath());
         assertThat(arguments.jarFileName()).isEqualTo(Defaults.JAR_FILE_NAME);
@@ -32,7 +33,7 @@ class AppTest {
             "custom.jar"
         );
         
-        assertThat(arguments.sourceDirectory()).isEqualTo(Path.of("custom/src"));
+        assertThat(arguments.sourcesDirectory()).isEqualTo(Path.of("custom/src"));
         assertThat(arguments.classesDirectory()).isEqualTo(Path.of("custom/classes"));
         assertThat(arguments.jarDirectory()).isEqualTo(Path.of("custom/jar"));
         assertThat(arguments.jarFileName()).isEqualTo("custom.jar");
@@ -42,7 +43,7 @@ class AppTest {
     void argumentsWithPartialCustomValues() {
         var arguments = App.Arguments.from("custom/src");
         
-        assertThat(arguments.sourceDirectory()).isEqualTo(Path.of("custom/src"));
+        assertThat(arguments.sourcesDirectory()).isEqualTo(Path.of("custom/src"));
         assertThat(arguments.classesDirectory()).isEqualTo(CLASSES_DIR.asPath());
         assertThat(arguments.jarDirectory()).isEqualTo(JAR_DIR.asPath());
         assertThat(arguments.jarFileName()).isEqualTo(Defaults.JAR_FILE_NAME);
@@ -52,9 +53,23 @@ class AppTest {
     @Test
     void createZBJar() throws IOException {
         App.main();
-
         var manifest = JarLoader.loadManifest(Path.of(JAR_DIR.asString(),Defaults.JAR_FILE_NAME));
         assertThat(manifest).isNotNull();
         assertThat(manifest.getMainAttributes().getValue("Main-Class")).isEqualTo("airhacks.App");
+    }
+
+    @Test
+    void servicesConfigurationFileIsIncluded() throws IOException {
+        var arguments = new App.Arguments(
+            Path.of("src/main/java"),
+            Optional.of(Path.of("src/test/resources")),
+            App.Defaults.CLASSES_DIR.asPath(),
+            App.Defaults.JAR_DIR.asPath(),
+            App.Defaults.JAR_FILE_NAME
+        );
+        App.build(arguments);
+        var metaINF = JarLoader.loadMetaInfServices(Path.of(JAR_DIR.asString(),Defaults.JAR_FILE_NAME));
+        assertThat(metaINF).hasSize(1);
+        assertThat(metaINF.get(0).getName()).isEqualTo("META-INF/services/hello");
     }
 } 
