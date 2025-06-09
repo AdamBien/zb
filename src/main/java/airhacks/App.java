@@ -26,7 +26,7 @@ import airhacks.zb.stopwatch.control.StopWatch;
  */
 public interface App {
 
-    String VERSION = "zb v2025.06.09.1";    
+    String VERSION = "zb v2025.06.09.2";    
 
     enum Defaults {
         CLASSES_DIR("zbo/classes"),
@@ -68,18 +68,20 @@ public interface App {
 
     static void build(Arguments arguments) throws IOException {
         var sourceDirectory = arguments.sourcesDirectory();
+        var classesDirectory = arguments.classesDirectory();
+        
         var javaFiles = JavaFiles.findFrom(sourceDirectory);
         var mainClass = JavaFiles.findMainClass(javaFiles);
-        var classesDirectory = arguments.classesDirectory();
-        var resourcesDirectory = arguments.resourcesDirectory();
+        
         UserHint.showHint(sourceDirectory, javaFiles, mainClass);
-
         Compiler.compile(javaFiles, classesDirectory);
-
+        
+        var resourcesDirectory = arguments.resourcesDirectory();
         var relativeMainClass = mainClass.map(p -> sourceDirectory.relativize(p));
+        var jarDirectory = arguments.jarDirectory();
+        var jarFileName = arguments.jarFileName();
 
-        Packer.archive(classesDirectory, resourcesDirectory, arguments.jarDirectory(), arguments.jarFileName(),
-                relativeMainClass);
+        Packer.createJAR(classesDirectory, resourcesDirectory, jarDirectory, jarFileName,relativeMainClass);
         Cleaner.cleanClasses(classesDirectory);
     }
 

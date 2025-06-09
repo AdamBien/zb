@@ -15,7 +15,7 @@ import java.util.jar.JarOutputStream;
  */
 public interface Packer {
 
-    static void archive(Path rootClassesDirectory, Optional<Path> rootResourcesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass) throws IOException {
+    static void createJAR(Path rootClassesDirectory, Optional<Path> rootResourcesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass) throws IOException {
         var jarFile = rootJARDirectory.resolve(jarFileName);
         Files.createDirectories(rootJARDirectory);
         Files.deleteIfExists(jarFile);
@@ -33,10 +33,15 @@ public interface Packer {
                 var dir = rootResourcesDirectory.get();
                 try (var paths = Files.walk(dir)) {
                     paths.filter(Files::isRegularFile)
+                         .filter(Packer::isMetaInfServices)
                          .forEach(path -> addEntry(dir, jos, path));
                 }
             }
         }
+    }
+
+    static boolean isMetaInfServices(Path path) {
+        return path.toString().contains("META-INF/services");
     }
 
     static void addManifest(Path rootClassesDirectory, JarOutputStream jos, Path mainClass) {
