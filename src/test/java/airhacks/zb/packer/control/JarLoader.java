@@ -15,11 +15,22 @@ public interface JarLoader {
         }
     }
 
-    static List<JarEntry> loadMetaInfServices(Path jarFile) throws IOException {
+    record JarEntryWithContent(String name, String content) {
+        static JarEntryWithContent of(JarFile jar,JarEntry entry){
+            try(var is = jar.getInputStream(entry)) {
+                return new JarEntryWithContent(entry.getName(), new String(is.readAllBytes()));
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read entry: " + entry.getName(), e);
+            }
+        }
+    }
+
+    static List<JarEntryWithContent> loadMetaInfServices(Path jarFile) throws IOException {
         try(var jar = new JarFile(jarFile.toFile())) {
             return jar
             .stream()
             .filter(JarLoader::isMetaServices)
+            .map(entry -> JarEntryWithContent.of(jar, entry))
             .toList();
         }
     }
@@ -27,5 +38,6 @@ public interface JarLoader {
     static boolean isMetaServices(JarEntry entry) {
         return entry.getName().startsWith("META-INF/services");
     }
+
 
 }

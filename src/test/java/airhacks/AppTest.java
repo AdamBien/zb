@@ -70,6 +70,10 @@ class AppTest {
         App.build(arguments);
         var metaINF = JarLoader.loadMetaInfServices(Path.of(JAR_DIR.asString(),Defaults.JAR_FILE_NAME));
         assertThat(metaINF).hasSize(1);
-        assertThat(metaINF.get(0).getName()).isEqualTo("META-INF/services/hello");
+        var entry = metaINF.getFirst();
+        assertThat(entry.name()).isEqualTo("META-INF/services/hello");
+        assertThat(entry.content()).isEqualTo("duke");
     }
+
+
 } 
