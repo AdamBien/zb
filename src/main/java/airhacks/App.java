@@ -51,6 +51,7 @@ public interface App {
         
         UserHint.showHint(sourceDirectory, javaFiles, mainClass);
         Compiler.compile(javaFiles, classesDirectory);
+        Log.user("🔍 compiled %d files".formatted(javaFiles.size()));
         
         var resourcesDirectory = arguments.resourcesDirectory();
         var relativeMainClass = mainClass.map(p -> sourceDirectory.relativize(p));
