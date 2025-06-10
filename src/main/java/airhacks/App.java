@@ -17,7 +17,7 @@ import airhacks.zb.stopwatch.control.StopWatch;
  */
 public interface App {
 
-    String VERSION = "zb v2025.06.10.1";    
+    String VERSION = "zb v2025.06.10.2";    
 
     enum Defaults {
         CLASSES_DIR("zbo/classes"),
