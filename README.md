@@ -24,7 +24,7 @@ A lightweight Java build tool that requires zero external dependencies. Built us
 
 ```bash
 # Clone the repository
-git clone https://github.com/[username]/zb.git
+git clone https://github.com/AdamBien/zb.git
 cd zb
 
 # Build with Maven
