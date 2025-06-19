@@ -9,6 +9,7 @@ import airhacks.zb.discovery.control.JavaFiles;
 import airhacks.zb.hints.boundary.UserHint;
 import airhacks.zb.log.boundary.Log;
 import airhacks.zb.packer.control.Packer;
+import airhacks.zb.prereqs.control.Directories;
 import airhacks.zb.stopwatch.control.StopWatch;
 
 /**
@@ -17,7 +18,7 @@ import airhacks.zb.stopwatch.control.StopWatch;
  */
 public interface App {
 
-    String VERSION = "zb v2025.06.10.2";    
+    String VERSION = "zb v2025.06.19.1";    
 
     enum Defaults {
         CLASSES_DIR("zbo/classes"),
@@ -50,6 +51,7 @@ public interface App {
         var mainClass = JavaFiles.findMainClass(javaFiles);
         
         UserHint.showHint(sourceDirectory, javaFiles, mainClass);
+        Directories.createIfNotExists(classesDirectory);
         Compiler.compile(javaFiles, classesDirectory);
         Log.user("🔍 compiled %d files".formatted(javaFiles.size()));
         
