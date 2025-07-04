@@ -1,9 +1,13 @@
 package airhacks.zb.configuration.control;
 
 import airhacks.AppArguments;
+import airhacks.zb.log.boundary.Log;
 
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
 public enum Configuration {
     SOURCES_DIR, RESOURCES_DIR, CLASSES_DIR, JAR_DIR, JAR_FILE_NAME;
@@ -14,13 +18,26 @@ public enum Configuration {
     }
 
     public String get(String defaultValue) {
-        var property = System.getProperty(toProperty());
-        return Optional
-                .ofNullable(property)
-                .stream()
-                .filter(p -> !p.equals(DISCOVERED))
-                .findFirst()
-                .orElse(defaultValue);
+        var properties = new Properties();
+        try {
+            try(var reader = new FileReader(PropertyFile.PROPERTY_FILE.toFile())){
+                properties.load(reader);
+                var property = toProperty();
+                if(property.equals(DISCOVERED)) {
+                    Log.user("🔍 using default value %s for %s".formatted(defaultValue,name()));
+                }
+                return Optional
+                        .ofNullable(property)
+                        .stream()
+                        .filter(p -> !p.equals(DISCOVERED))
+                        .findFirst()
+                        .orElse(defaultValue);
+        
+            }
+        } catch (IOException e) {
+            Log.error("failed to load properties from %s".formatted(PropertyFile.PROPERTY_FILE),e);
+        }
+        return defaultValue;
     }
 
     static Map<String, String> defaults() {
