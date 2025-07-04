@@ -23,11 +23,9 @@ public enum Configuration {
             try(var reader = new FileReader(PropertyFile.PROPERTY_FILE.toFile())){
                 properties.load(reader);
                 var property = toProperty();
-                if(property.equals(DISCOVERED)) {
-                    Log.user("🔍 using default value %s for %s".formatted(defaultValue,name()));
-                }
+                var value = properties.getProperty(property);
                 return Optional
-                        .ofNullable(property)
+                        .ofNullable(value)
                         .stream()
                         .filter(p -> !p.equals(DISCOVERED))
                         .findFirst()
