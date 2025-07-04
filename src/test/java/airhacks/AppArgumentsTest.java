@@ -1,15 +1,12 @@
 package airhacks;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
-import airhacks.App.Defaults;
 import airhacks.zb.discovery.control.SourceLocator;
-
-import static airhacks.App.Defaults.CLASSES_DIR;
-import static airhacks.App.Defaults.JAR_DIR;
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class AppArgumentsTest {
@@ -20,9 +17,9 @@ public class AppArgumentsTest {
         var arguments = AppArguments.from();
         
         assertThat(arguments.sourcesDirectory()).isEqualTo(SourceLocator.detectSourceDirectory().orElseThrow());
-        assertThat(arguments.classesDirectory()).isEqualTo(CLASSES_DIR.asPath());
-        assertThat(arguments.jarDirectory()).isEqualTo(JAR_DIR.asPath());
-        assertThat(arguments.jarFileName()).isEqualTo(Defaults.JAR_FILE_NAME);
+        assertThat(arguments.classesDirectory()).isEqualTo(AppArguments.Defaults.CLASSES_DIR.asPath());
+        assertThat(arguments.jarDirectory()).isEqualTo(AppArguments.Defaults.JAR_DIR.asPath());
+        assertThat(arguments.jarFileName()).isEqualTo(AppArguments.Defaults.JAR_FILE_NAME);
     }
 
     @Test
