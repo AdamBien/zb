@@ -20,27 +20,7 @@ public interface App {
 
     String VERSION = "zb v2025.07.04.1";    
 
-    enum Defaults {
-        CLASSES_DIR("zbo/classes"),
-        JAR_DIR("zbo/");
 
-        public static final String JAR_FILE_NAME = "app.jar";
-
-        private final String path;
-
-        Defaults(String path) {
-            this.path = path;
-        }
-
-        public String asString() {
-            return path;
-        }
-
-        public Path asPath() {
-            return Path.of(this.path);
-        }
-
-    }
 
 
     static void build(AppArguments arguments) throws IOException {
