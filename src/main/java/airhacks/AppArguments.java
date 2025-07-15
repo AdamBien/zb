@@ -15,7 +15,7 @@ import airhacks.zb.log.boundary.Log;
 public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirectory, Path classesDirectory,
         Path jarDirectory, String jarFileName) {
     public enum Defaults {
-        CLASSES_DIR("zbo/classes"),
+        CLASSES_DIR("[TEMP]"),
         JAR_DIR("zbo/");
 
         public static final String JAR_FILE_NAME = "app.jar";
@@ -37,12 +37,25 @@ public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirect
     }
 
     static AppArguments from(String... args) {
+        var classesDir = args.length > 1 ? args[1] : Configuration.CLASSES_DIR.get(Defaults.CLASSES_DIR.asString());
+        var classesPath = "[TEMP]".equals(classesDir) ? createTempDirectory() : Path.of(classesDir);
+        
         return new AppArguments(
                 args.length > 0 ? Path.of(args[0]) : SourceLocator.detectSourceDirectory().orElseThrow(),
                 ResourceLocator.detectResourcesDirectory(),
-                Path.of(args.length > 1 ? args[1] : Defaults.CLASSES_DIR.asString()),
+                classesPath,
                 Path.of(args.length > 2 ? args[2] : Configuration.JAR_DIR.get(Defaults.JAR_DIR.asString())),
                 args.length > 3 ? args[3] : Configuration.JAR_FILE_NAME.get(Defaults.JAR_FILE_NAME));
+    }
+    
+    static Path createTempDirectory() {
+        try {
+            var tempDir = java.nio.file.Files.createTempDirectory("zb-classes-");
+            Log.user("📁 using temporary directory: %s".formatted(tempDir));
+            return tempDir;
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Failed to create temporary directory", e);
+        }
     }
 
     public void userInfo() {

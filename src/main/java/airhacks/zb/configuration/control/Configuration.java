@@ -42,7 +42,7 @@ public enum Configuration {
         return Map.of(
                 SOURCES_DIR.toProperty(), DISCOVERED,
                 RESOURCES_DIR.toProperty(), DISCOVERED,
-                CLASSES_DIR.toProperty(), AppArguments.Defaults.CLASSES_DIR.asString(),
+                CLASSES_DIR.toProperty(), "[TEMP]",
                 JAR_DIR.toProperty(), AppArguments.Defaults.JAR_DIR.asString(),
                 JAR_FILE_NAME.toProperty(), AppArguments.Defaults.JAR_FILE_NAME);
     }
