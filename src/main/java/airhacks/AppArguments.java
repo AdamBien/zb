@@ -11,7 +11,7 @@ import airhacks.zb.log.boundary.Log;
 public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirectory, Path classesDirectory,
         Path jarDirectory, String jarFileName, boolean isClassesDirTemporary) {
     
-    public static final String TEMP_DIR_MARKER = "[temp.dir]";
+    public static final String TEMP_DIR_MARKER = "<temp.dir>";
     public enum Defaults {
         CLASSES_DIR(TEMP_DIR_MARKER),
         JAR_DIR("zbo/");
