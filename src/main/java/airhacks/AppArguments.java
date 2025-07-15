@@ -14,8 +14,10 @@ import airhacks.zb.log.boundary.Log;
 
 public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirectory, Path classesDirectory,
         Path jarDirectory, String jarFileName) {
+    
+    public static final String TEMP_DIR_MARKER = "[temp.dir]";
     public enum Defaults {
-        CLASSES_DIR("[TEMP]"),
+        CLASSES_DIR(TEMP_DIR_MARKER),
         JAR_DIR("zbo/");
 
         public static final String JAR_FILE_NAME = "app.jar";
@@ -38,7 +40,7 @@ public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirect
 
     static AppArguments from(String... args) {
         var classesDir = args.length > 1 ? args[1] : Configuration.CLASSES_DIR.get(Defaults.CLASSES_DIR.asString());
-        var classesPath = "[TEMP]".equals(classesDir) ? createTempDirectory() : Path.of(classesDir);
+        var classesPath = TEMP_DIR_MARKER.equals(classesDir) ? createTempDirectory() : Path.of(classesDir);
         
         return new AppArguments(
                 args.length > 0 ? Path.of(args[0]) : SourceLocator.detectSourceDirectory().orElseThrow(),

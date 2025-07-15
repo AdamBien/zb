@@ -58,7 +58,7 @@ java -jar zb.jar src/main/java target/classes target/jar myapp.jar
 | Parameter | Default Value |
 |-----------|---------------|
 | Source Directory | `src/main/java`, `src` or current directory |
-| Classes Directory | `zbo/classes` |
+| Classes Directory | `[temp.dir]` (temporary directory) |
 | JAR Output Directory | `zbo` |
 | JAR Filename | `app.jar` |
 
@@ -72,7 +72,7 @@ zb supports configuration through a `.zb` properties file in your project root. 
 |----------|-------------|---------------|
 | `sources.dir` | Source directory path | `<discovered by zb>` |
 | `resources.dir` | Resources directory path | `<discovered by zb>` |
-| `classes.dir` | Compiled classes output directory | `zbo/classes` |
+| `classes.dir` | Compiled classes output directory | `[temp.dir]` |
 | `jar.dir` | JAR output directory | `zbo/` |
 | `jar.file.name` | Name of the generated JAR file | `app.jar` |
 
@@ -82,7 +82,7 @@ zb supports configuration through a `.zb` properties file in your project root. 
 # .zb configuration file
 sources.dir=src/main/java
 resources.dir=src/main/resources
-classes.dir=target/classes
+classes.dir=[temp.dir]  # or specify a custom directory like target/classes
 jar.dir=target/
 jar.file.name=myapp.jar
 ```
@@ -92,6 +92,14 @@ jar.file.name=myapp.jar
 When `sources.dir` or `resources.dir` are set to `<discovered by zb>`, the tool will automatically:
 - Search for source directories in common locations (`src/main/java`, `src`, or current directory)
 - Locate resource directories relative to the source directory
+
+### Temporary Directory for Classes
+
+When `classes.dir` is set to `[temp.dir]`, zb will:
+- Create a unique temporary directory for compiled classes
+- Display the temporary directory path during build
+- Automatically clean up the directory after JAR creation
+- This is the default behavior to avoid cluttering your project
 
 ## How It Works
 
