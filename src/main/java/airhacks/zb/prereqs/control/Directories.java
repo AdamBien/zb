@@ -11,6 +11,7 @@ public interface Directories {
     static Path createIfNotExists(Path directory) {
         try {
             Files.createDirectories(directory);
+            Log.user("📁 %s created".formatted(directory.toString()));
         } catch (IOException e) {
             Log.error("Failed to create directory:  ",e);
         }

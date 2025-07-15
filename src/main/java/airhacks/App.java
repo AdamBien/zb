@@ -17,7 +17,7 @@ import airhacks.zb.stopwatch.control.StopWatch;
  */
 public interface App {
 
-    String VERSION = "zb v2025.07.15.2";    
+    String VERSION = "zb v2025.07.15.5";    
 
 
     static void build(AppArguments arguments) throws IOException {
@@ -38,7 +38,9 @@ public interface App {
         var jarFileName = arguments.jarFileName();
 
         Packer.createJAR(classesDirectory, resourcesDirectory, jarDirectory, jarFileName,relativeMainClass);
-        Cleaner.cleanClasses(classesDirectory);
+        if (arguments.isClassesDirTemporary()) {
+            Cleaner.cleanClasses(classesDirectory);
+        }
     }
 
     static void main(String... args) throws IOException {
