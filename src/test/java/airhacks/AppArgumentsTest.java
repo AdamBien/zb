@@ -18,7 +18,7 @@ public class AppArgumentsTest {
         var arguments = AppArguments.from();
         
         assertThat(arguments.sourcesDirectory()).isEqualTo(SourceLocator.detectSourceDirectory().orElseThrow());
-        // When using default [temp.dir], a temporary directory is created
+        // When using default <temp.dir>, a temporary directory is created
         assertThat(arguments.classesDirectory().toString()).isNotEqualTo(AppArguments.TEMP_DIR_MARKER);
         assertThat(arguments.jarDirectory()).isEqualTo(AppArguments.Defaults.JAR_DIR.asPath());
         assertThat(arguments.jarFileName()).isEqualTo(AppArguments.Defaults.JAR_FILE_NAME);
@@ -84,7 +84,7 @@ public class AppArgumentsTest {
     
     @Test
     void tempDirMarkerInCommandLineCreatesTempDirectory() {
-        var arguments = AppArguments.from("src/main/java", "[temp.dir]");
+        var arguments = AppArguments.from("src/main/java", AppArguments.TEMP_DIR_MARKER);
         
         assertThat(arguments.classesDirectory()).isNotNull();
         assertThat(Files.exists(arguments.classesDirectory())).isTrue();
