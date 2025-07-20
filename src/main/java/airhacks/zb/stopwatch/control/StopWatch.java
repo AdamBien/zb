@@ -3,7 +3,7 @@ package airhacks.zb.stopwatch.control;
 import java.time.Duration;
 import java.time.Instant;
 
-import airhacks.zb.log.boundary.Log;
+import airhacks.zb.log.control.Log;
 
 public record StopWatch(Instant begin) {
 

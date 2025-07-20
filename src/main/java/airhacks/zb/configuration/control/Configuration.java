@@ -1,13 +1,13 @@
 package airhacks.zb.configuration.control;
 
-import airhacks.AppArguments;
-import airhacks.zb.log.boundary.Log;
-
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+
+import airhacks.AppArguments;
+import airhacks.zb.log.control.Log;
 
 public enum Configuration {
     SOURCES_DIR, RESOURCES_DIR, CLASSES_DIR, JAR_DIR, JAR_FILE_NAME;

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import airhacks.zb.log.boundary.Log;
+import airhacks.zb.log.control.Log;
 
 public interface Directories {
 

@@ -1,20 +1,20 @@
-package airhacks.zb.log.boundary;
+package airhacks.zb.log.control;
 
 import java.io.PrintStream;
 
 public enum Log {
 
     ERROR(Color.BRIGHT_RED, System.err),
-    PROMPT(Color.PROMPT, System.out),
-    INFO(Color.WARM_YELLOW, System.out),
-    SYSTEM(Color.BRIGHT_BLUE, System.out),
-    WARNING(Color.BRIGHT_WHITE, System.out),
-    DEBUG(Color.BLACK_ON_WHITE, System.out);
+    USER(Color.BRIGHT_CYAN, System.out),
+    INFO(Color.BRIGHT_GREEN, System.out),
+    SYSTEM(Color.SKY_BLUE, System.out),
+    WARNING(Color.WARM_YELLOW, System.out),
+    DEBUG(Color.SOFT_PURPLE, System.out);
 
     PrintStream out;
 
     enum Color {
-        PROMPT("\033[38;5;246m"),      // Soft gray
+        SOFT_GRAY("\033[38;5;246m"),      // Soft gray
         WARM_YELLOW("\033[38;5;220m"),        // Warm yellow
         BRIGHT_BLUE("\033[38;5;33m"),     // Bright blue
         BRIGHT_WHITE("\033[38;5;255m"),      // Bright white
@@ -63,6 +63,6 @@ public enum Log {
     }
 
     public static void warning(String message){
-        Log.INFO.out(message);
+        Log.WARNING.out(message);
     }
 }

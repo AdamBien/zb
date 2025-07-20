@@ -6,7 +6,7 @@ import java.util.Optional;
 import airhacks.zb.configuration.control.Configuration;
 import airhacks.zb.discovery.control.ResourceLocator;
 import airhacks.zb.discovery.control.SourceLocator;
-import airhacks.zb.log.boundary.Log;
+import airhacks.zb.log.control.Log;
 
 public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirectory, Path classesDirectory,
         Path jarDirectory, String jarFileName, boolean isClassesDirTemporary) {

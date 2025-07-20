@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import airhacks.zb.hints.boundary.UserHint;
-import airhacks.zb.log.boundary.Log;
+import airhacks.zb.log.control.Log;
 
 public interface JavaFiles {
 

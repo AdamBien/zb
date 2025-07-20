@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import airhacks.App;
-import airhacks.zb.log.boundary.Log;
+import airhacks.zb.log.control.Log;
 
 public interface PropertyFile {
     Path PROPERTY_FILE = Path.of(".zb");

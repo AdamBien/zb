@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import airhacks.zb.log.boundary.Log;
+import airhacks.zb.log.control.Log;
 
 public interface UserHint {
 
