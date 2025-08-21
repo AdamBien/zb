@@ -107,3 +107,7 @@ When `classes.dir` is set to `<temp.dir>`, zb will:
 2. **Main Class Detection**: Identifies the main class for the executable JAR
 3. **Compilation**: Compiles all Java files to bytecode
 4. **Packaging**: Creates an executable JAR with proper manifest
+
+## Videos
+
+[![zb - Zero Dependencies Builder](https://img.youtube.com/vi/7Bes0O3bPwo/0.jpg)](https://www.youtube.com/watch?v=7Bes0O3bPwo)
