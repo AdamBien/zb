@@ -1,6 +1,6 @@
 # zb (Zero Dependencies Builder)
 
-A lightweight Java build tool that requires zero external dependencies. Built using pure Java 21 functionality.
+A lightweight Java build tool that requires zero external dependencies. Built using pure Java 25 functionality.
 
 ![Duke Builder](dukebuilder.png)
 
