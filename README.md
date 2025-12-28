@@ -31,8 +31,18 @@ cd zb
 mvn clean package
 
 # The executable JAR will be in target/zb.jar
-# Copy it to your desired location
-cp target/zb.jar ~/bin/zb.jar
+# Copy it along with the shell wrapper to your desired location
+cp target/zb.jar src/main/sh/zb.sh ~/bin/
+chmod +x ~/bin/zb.sh
+```
+
+### Shell Wrapper
+
+The `zb.sh` script provides a convenient way to run zb without typing `java -jar`:
+
+```bash
+# Instead of: java -jar zb.jar
+zb.sh
 ```
 
 ## Usage
