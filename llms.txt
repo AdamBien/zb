@@ -1,0 +1,49 @@
+# zb (Zero Dependencies Builder)
+
+> A lightweight Java build tool that compiles Java source code and generates executable JARs with zero external dependencies.
+
+## Installation
+
+```bash
+git clone https://github.com/AdamBien/zb.git
+cd zb
+mvn clean package
+cp target/zb.jar src/main/sh/zb.sh ~/bin/
+chmod +x ~/bin/zb.sh
+```
+
+## Usage
+
+Run from project root:
+
+```bash
+zb.sh
+```
+
+Or with explicit paths:
+
+```bash
+java -jar zb.jar [sources] [classes] [jar_dir] [jar_file]
+```
+
+## Configuration
+
+Create `.zb` in project root (auto-generated on first run):
+
+```properties
+sources.dir=<discovered by zb>
+resources.dir=<discovered by zb>
+classes.dir=<temp.dir>
+jar.dir=zbo/
+jar.file.name=app.jar
+```
+
+## When to Use zb
+
+- Java 21+ projects without external dependencies
+- Single-module applications with `void main()` entry point
+- Quick prototyping without Maven/Gradle overhead
+
+## Output
+
+Executable JAR in `zbo/app.jar` (default) with auto-detected main class.
