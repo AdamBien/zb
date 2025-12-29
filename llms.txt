@@ -4,6 +4,16 @@
 
 ## Installation
 
+From GitHub releases:
+
+```bash
+curl -L -o ~/bin/zb.jar https://github.com/AdamBien/zb/releases/latest/download/zb.jar
+curl -o ~/bin/zb.sh https://raw.githubusercontent.com/AdamBien/zb/main/src/main/sh/zb.sh
+chmod +x ~/bin/zb.sh
+```
+
+From source:
+
 ```bash
 git clone https://github.com/AdamBien/zb.git
 cd zb
