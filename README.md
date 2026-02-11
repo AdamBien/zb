@@ -118,6 +118,10 @@ When `classes.dir` is set to `<temp.dir>`, zb will:
 3. **Compilation**: Compiles all Java files to bytecode
 4. **Packaging**: Creates an executable JAR with proper manifest
 
+## AI-Assisted Development
+
+zb includes a [SKILL.md](SKILL.md) for use with [airails.dev](https://airails.dev) AI-assisted development workflows.
+
 ## Videos
 
 [![zb - Zero Dependencies Builder](https://img.youtube.com/vi/7Bes0O3bPwo/0.jpg)](https://www.youtube.com/watch?v=7Bes0O3bPwo)
