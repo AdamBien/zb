@@ -118,6 +118,17 @@ When `classes.dir` is set to `<temp.dir>`, zb will:
 3. **Compilation**: Compiles all Java files to bytecode
 4. **Packaging**: Creates an executable JAR with proper manifest
 
+## Testing with zunit
+
+[zunit](https://github.com/AdamBien/zunit) is a zero-dependency, single-file Java test runner that integrates with zb. It reads the `.zb` configuration file to resolve the JAR classpath automatically:
+
+```bash
+# Build with zb, then run tests with zunit
+zb && zunit
+```
+
+A [/zunit skill](https://github.com/AdamBien/airails/tree/main/java/zunit) is available for AI-assisted generation and execution of zunit tests.
+
 ## AI-Assisted Development
 
 zb includes a [SKILL.md](SKILL.md) for use with [airails.dev](https://airails.dev) AI-assisted development workflows.
