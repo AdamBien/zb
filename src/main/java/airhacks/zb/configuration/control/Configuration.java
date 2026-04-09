@@ -10,7 +10,7 @@ import airhacks.AppArguments;
 import airhacks.zb.log.control.Log;
 
 public enum Configuration {
-    SOURCES_DIR, RESOURCES_DIR, CLASSES_DIR, JAR_DIR, JAR_FILE_NAME;
+    SOURCES_DIR, RESOURCES_DIR, CLASSES_DIR, JAR_DIR, JAR_FILE_NAME, POST_BUILD_HOOK;
 
     static final String DISCOVERED = "<discovered by zb>";
     static {
@@ -44,7 +44,8 @@ public enum Configuration {
                 RESOURCES_DIR.toProperty(), DISCOVERED,
                 CLASSES_DIR.toProperty(), AppArguments.TEMP_DIR_MARKER,
                 JAR_DIR.toProperty(), AppArguments.Defaults.JAR_DIR.asString(),
-                JAR_FILE_NAME.toProperty(), AppArguments.Defaults.JAR_FILE_NAME);
+                JAR_FILE_NAME.toProperty(), AppArguments.Defaults.JAR_FILE_NAME,
+                POST_BUILD_HOOK.toProperty(), "<none>");
     }
 
     String toProperty() {
