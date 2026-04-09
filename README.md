@@ -85,6 +85,7 @@ zb supports configuration through a `.zb` properties file in your project root. 
 | `classes.dir` | Compiled classes output directory | `<temp.dir>` |
 | `jar.dir` | JAR output directory | `zbo/` |
 | `jar.file.name` | Name of the generated JAR file | `app.jar` |
+| `post.build.hook` | Script to execute after a successful build | `<none>` |
 
 ### Example Configuration
 
@@ -110,6 +111,17 @@ When `classes.dir` is set to `<temp.dir>`, zb will:
 - Display the temporary directory path during build
 - Automatically clean up the directory after JAR creation
 - This is the default behavior to avoid cluttering your project
+
+### Post-Build Hook
+
+zb can execute any script after a successful build. Configure `post.build.hook` in your `.zb` file:
+
+```properties
+# Run zunit tests after every successful build
+post.build.hook=zunit
+```
+
+The hook receives build context as environment variables: `ZB_JAR_PATH`, `ZB_SOURCE_DIR`, `ZB_JAR_DIR`, `ZB_JAR_FILE_NAME`. A non-zero exit code is logged as a warning but does not fail the build.
 
 ## How It Works
 
