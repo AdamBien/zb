@@ -2,7 +2,7 @@
 
 A lightweight Java build tool that requires zero external dependencies. Built using pure Java 25 functionality.
 
-![Duke Builder](dukebuilder.png)
+<img src="dukebuilder.png" alt="Duke Builder" width="200">
 
 
 ## Features
