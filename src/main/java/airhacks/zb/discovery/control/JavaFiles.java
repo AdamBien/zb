@@ -31,19 +31,36 @@ public interface JavaFiles {
                 .toList();
     }
 
-    static Optional<Path> findMainClass(List<Path> javaPaths) {
+    static Optional<Path> findMainClass(List<Path> javaPaths, Optional<String> configuredMainClass) {
         var mainClasses = findMain(javaPaths);
-        
+
         if (mainClasses.isEmpty()) {
             Log.warning("No main class found");
             return Optional.empty();
         }
         if (mainClasses.size() > 1) {
-            Log.warning("Multiple main classes found");
-            System.exit(0);
+            if (configuredMainClass.isEmpty()) {
+                Log.warning("Multiple main classes found: " + mainClasses);
+                Log.user("💡 Configure 'main.class' in .zb to select one, e.g. main.class=com.example.App");
+                System.exit(0);
+            }
+            var className = configuredMainClass.get();
+            var match = mainClasses.stream()
+                    .filter(path -> pathMatchesClassName(path, className))
+                    .findFirst();
+            if (match.isEmpty()) {
+                Log.warning("Configured main class '%s' not found among: %s".formatted(className, mainClasses));
+                System.exit(0);
+            }
+            return match;
         }
         return Optional.of(mainClasses.getFirst());
 
+    }
+
+    static boolean pathMatchesClassName(Path path, String className) {
+        var pathString = path.toString().replace("/", ".").replace("\\", ".");
+        return pathString.endsWith(className + ".java");
     }
 
     static boolean containsMainMethod(Path path) {

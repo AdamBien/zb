@@ -2,8 +2,11 @@ package airhacks;
 
 import java.io.IOException;
 
+import java.util.Optional;
+
 import airhacks.zb.cleanup.control.Cleaner;
 import airhacks.zb.compiler.control.Compiler;
+import airhacks.zb.configuration.control.Configuration;
 import airhacks.zb.discovery.control.JavaFiles;
 import airhacks.zb.hints.boundary.UserHint;
 import airhacks.zb.hook.control.PostBuildHook;
@@ -18,7 +21,7 @@ import airhacks.zb.stopwatch.control.StopWatch;
  */
 public interface App {
 
-    String VERSION = "zb v2026.04.09.01";    
+    String VERSION = "zb v2026.04.21.01";    
 
 
     static void build(AppArguments arguments) throws IOException {
@@ -26,7 +29,8 @@ public interface App {
         var classesDirectory = arguments.classesDirectory();
         
         var javaFiles = JavaFiles.findFrom(sourceDirectory);
-        var mainClass = JavaFiles.findMainClass(javaFiles);
+        var configuredMainClass = Optional.ofNullable(Configuration.MAIN_CLASS.get(null));
+        var mainClass = JavaFiles.findMainClass(javaFiles, configuredMainClass);
         
         UserHint.showHint(sourceDirectory, javaFiles, mainClass);
         Directories.createIfNotExists(classesDirectory);
