@@ -21,7 +21,7 @@ import airhacks.zb.stopwatch.control.StopWatch;
  */
 public interface App {
 
-    String VERSION = "zb v2026.04.21.01";    
+    String VERSION = "zb v2026.04.26.01";    
 
 
     static void build(AppArguments arguments) throws IOException {

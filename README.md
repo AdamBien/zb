@@ -15,7 +15,7 @@ A lightweight Java build tool that requires zero external dependencies. Built us
 
 ## Prerequisites
 
-- Java 21 or later
+- Java 25 or later
 - Git (for cloning the repository)
 
 ## Installation
