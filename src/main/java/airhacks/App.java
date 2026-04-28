@@ -21,7 +21,15 @@ import airhacks.zb.stopwatch.control.StopWatch;
  */
 public interface App {
 
-    String VERSION = "zb v2026.04.26.01";    
+    String VERSION = "zb v" + readVersion();
+
+    private static String readVersion() {
+        try (var in = App.class.getResourceAsStream("/version.txt")) {
+            return new String(in.readAllBytes()).trim();
+        } catch (IOException e) {
+            return "unknown";
+        }
+    }
 
 
     static void build(AppArguments arguments) throws IOException {
