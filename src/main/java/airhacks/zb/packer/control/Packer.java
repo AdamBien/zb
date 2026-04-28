@@ -15,25 +15,29 @@ import java.util.jar.JarOutputStream;
  */
 public interface Packer {
 
+    String VERSION_FILE = "version.txt";
+
     static void createJAR(Path rootClassesDirectory, Optional<Path> rootResourcesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass) throws IOException {
         var jarFile = rootJARDirectory.resolve(jarFileName);
         Files.createDirectories(rootJARDirectory);
         Files.deleteIfExists(jarFile);
-        
+
+        var version = rootResourcesDirectory.flatMap(Packer::readVersion);
+
         try (var fos = Files.newOutputStream(jarFile, StandardOpenOption.CREATE_NEW);
              var jos = new JarOutputStream(fos)) {
-            
-            mainClass.ifPresent(mc -> addManifest(rootClassesDirectory, jos, mc));
-            
+
+            mainClass.ifPresent(mc -> addManifest(rootClassesDirectory, jos, mc, version));
+
             try (var paths = Files.walk(rootClassesDirectory)) {
                 paths.filter(path -> path.toString().endsWith(".class"))
                      .forEach(path -> addEntry(rootClassesDirectory, jos, path));
-            }   
+            }
             if(rootResourcesDirectory.isPresent()) {
                 var dir = rootResourcesDirectory.get();
                 try (var paths = Files.walk(dir)) {
                     paths.filter(Files::isRegularFile)
-                         .filter(Packer::isMetaInfServices)
+                         .filter(path -> isMetaInfServices(path) || isVersionFile(dir, path))
                          .forEach(path -> addEntry(dir, jos, path));
                 }
             }
@@ -44,10 +48,26 @@ public interface Packer {
         return path.toString().contains("META-INF/services");
     }
 
-    static void addManifest(Path rootClassesDirectory, JarOutputStream jos, Path mainClass) {
+    static boolean isVersionFile(Path resourcesDirectory, Path path) {
+        return path.equals(resourcesDirectory.resolve(VERSION_FILE));
+    }
+
+    static Optional<String> readVersion(Path resourcesDirectory) {
+        var versionFile = resourcesDirectory.resolve(VERSION_FILE);
+        if (!Files.isRegularFile(versionFile)) {
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(Files.readString(versionFile).trim());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    static void addManifest(Path rootClassesDirectory, JarOutputStream jos, Path mainClass, Optional<String> version) {
         var javaPackage = pathToJavaPackage(mainClass);
         var fullyQualifiedClassName = javaPackage.replace(".java", "");
-        var manifest = Manifestor.manifest(fullyQualifiedClassName);
+        var manifest = Manifestor.manifest(fullyQualifiedClassName, version);
         try {
             var entry = new JarEntry("META-INF/MANIFEST.MF");
             jos.putNextEntry(entry);
