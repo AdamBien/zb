@@ -31,15 +31,30 @@ public class PackerTest {
     }
 
     @Test
-    void readVersionWhenPresent(@TempDir Path resources) throws IOException {
+    void readVersionFromResourcesWhenRootMissing(@TempDir Path projectRoot, @TempDir Path resources) throws IOException {
         Files.writeString(resources.resolve("version.txt"), "2026.04.26.01\n");
-        var version = Packer.readVersion(resources);
+        var version = Packer.readVersion(projectRoot, Optional.of(resources));
         assertThat(version).contains("2026.04.26.01");
     }
 
     @Test
-    void readVersionWhenAbsent(@TempDir Path resources) {
-        var version = Packer.readVersion(resources);
+    void readVersionFromProjectRootPreferredOverResources(@TempDir Path projectRoot, @TempDir Path resources) throws IOException {
+        Files.writeString(projectRoot.resolve("version.txt"), "2026.05.26.01\n");
+        Files.writeString(resources.resolve("version.txt"), "2026.04.26.01\n");
+        var version = Packer.readVersion(projectRoot, Optional.of(resources));
+        assertThat(version).contains("2026.05.26.01");
+    }
+
+    @Test
+    void readVersionFromProjectRootWhenNoResources(@TempDir Path projectRoot) throws IOException {
+        Files.writeString(projectRoot.resolve("version.txt"), "2026.05.26.01\n");
+        var version = Packer.readVersion(projectRoot, Optional.empty());
+        assertThat(version).contains("2026.05.26.01");
+    }
+
+    @Test
+    void readVersionWhenAbsent(@TempDir Path projectRoot, @TempDir Path resources) {
+        var version = Packer.readVersion(projectRoot, Optional.of(resources));
         assertThat(version).isEmpty();
     }
 

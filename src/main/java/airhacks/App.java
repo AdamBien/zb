@@ -1,6 +1,7 @@
 package airhacks;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import java.util.Optional;
 
@@ -54,7 +55,7 @@ public interface App {
         var jarDirectory = arguments.jarDirectory();
         var jarFileName = arguments.jarFileName();
 
-        Packer.createJAR(classesDirectory, resourcesDirectory, jarDirectory, jarFileName,relativeMainClass);
+        Packer.createJAR(Path.of("."), classesDirectory, resourcesDirectory, jarDirectory, jarFileName,relativeMainClass);
         if (arguments.isClassesDirTemporary()) {
             Cleaner.cleanClasses(classesDirectory);
         }

@@ -17,12 +17,13 @@ public interface Packer {
 
     String VERSION_FILE = "version.txt";
 
-    static void createJAR(Path rootClassesDirectory, Optional<Path> rootResourcesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass) throws IOException {
+    static void createJAR(Path projectRoot, Path rootClassesDirectory, Optional<Path> rootResourcesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass) throws IOException {
         var jarFile = rootJARDirectory.resolve(jarFileName);
         Files.createDirectories(rootJARDirectory);
         Files.deleteIfExists(jarFile);
 
-        var version = rootResourcesDirectory.flatMap(Packer::readVersion);
+        var versionFile = locateVersionFile(projectRoot, rootResourcesDirectory);
+        var version = versionFile.flatMap(Packer::readVersionContent);
 
         try (var fos = Files.newOutputStream(jarFile, StandardOpenOption.CREATE_NEW);
              var jos = new JarOutputStream(fos)) {
@@ -37,21 +38,41 @@ public interface Packer {
                 var dir = rootResourcesDirectory.get();
                 try (var paths = Files.walk(dir)) {
                     paths.filter(Files::isRegularFile)
+                         .filter(path -> !path.equals(dir.resolve(VERSION_FILE)))
                          .forEach(path -> addEntry(dir, jos, path));
                 }
             }
+            versionFile.ifPresent(file -> addVersionEntry(jos, file));
         }
     }
 
-    static Optional<String> readVersion(Path resourcesDirectory) {
-        var versionFile = resourcesDirectory.resolve(VERSION_FILE);
-        if (!Files.isRegularFile(versionFile)) {
-            return Optional.empty();
+    static Optional<Path> locateVersionFile(Path projectRoot, Optional<Path> resourcesDirectory) {
+        var rootCandidate = projectRoot.resolve(VERSION_FILE);
+        if (Files.isRegularFile(rootCandidate)) {
+            return Optional.of(rootCandidate);
         }
+        return resourcesDirectory
+                .map(dir -> dir.resolve(VERSION_FILE))
+                .filter(Files::isRegularFile);
+    }
+
+    static Optional<String> readVersion(Path projectRoot, Optional<Path> resourcesDirectory) {
+        return locateVersionFile(projectRoot, resourcesDirectory).flatMap(Packer::readVersionContent);
+    }
+
+    static Optional<String> readVersionContent(Path versionFile) {
         try {
             return Optional.of(Files.readString(versionFile).trim());
         } catch (IOException e) {
             return Optional.empty();
+        }
+    }
+
+    static void addVersionEntry(JarOutputStream jos, Path versionFile) {
+        try {
+            addEntry(jos, Path.of(VERSION_FILE), Files.readAllBytes(versionFile));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to add version.txt to JAR: " + versionFile, e);
         }
     }
 
