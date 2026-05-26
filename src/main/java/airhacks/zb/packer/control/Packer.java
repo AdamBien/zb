@@ -37,19 +37,10 @@ public interface Packer {
                 var dir = rootResourcesDirectory.get();
                 try (var paths = Files.walk(dir)) {
                     paths.filter(Files::isRegularFile)
-                         .filter(path -> isMetaInfServices(path) || isVersionFile(dir, path))
                          .forEach(path -> addEntry(dir, jos, path));
                 }
             }
         }
-    }
-
-    static boolean isMetaInfServices(Path path) {
-        return path.toString().contains("META-INF/services");
-    }
-
-    static boolean isVersionFile(Path resourcesDirectory, Path path) {
-        return path.equals(resourcesDirectory.resolve(VERSION_FILE));
     }
 
     static Optional<String> readVersion(Path resourcesDirectory) {
