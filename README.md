@@ -20,6 +20,24 @@ A lightweight Java build tool that requires zero external dependencies. Built us
 
 ## Installation
 
+### Quick Install (from latest release)
+
+[`zbinstall`](zbinstall) is a single-file Java 25 script that fetches `zb.jar` and `zb.sh` from the latest GitHub release into the current directory:
+
+```bash
+# Fetch the installer and run it
+curl -fsSLO https://raw.githubusercontent.com/AdamBien/zb/main/zbinstall
+chmod +x zbinstall
+./zbinstall
+
+# Move both files onto your PATH
+mv zb.jar zb.sh ~/bin/
+```
+
+The download is atomic — a partial download cannot replace an existing `zb.jar` or `zb.sh`.
+
+Based on the [`java-cli-script`](https://airails.dev) skill from [airails.dev](https://airails.dev) — single-file, zero-dependency, shebang-launched Java 25 utilities.
+
 ### Build from Source
 
 ```bash
