@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface SourceLocator {
 
-    List<String> candidates = List.of("src/main/java", "src/", ".");
+    List<String> candidates = List.of("src/main/java", "src/",".");
 
     static Optional<Path> detectSourceDirectory() {
         var currentDir = Path.of(".");

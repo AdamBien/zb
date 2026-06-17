@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface ResourceLocator {
 
-    List<String> candidates = List.of("src/main/resources",  ".");
+    List<String> candidates = List.of("src/main/resources","resources");
 
     static Optional<Path> detectResourcesDirectory() {
         var currentDir = Path.of(".");
