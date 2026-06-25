@@ -45,12 +45,14 @@ Based on the [`java-cli-script`](https://airails.dev) skill from [airails.dev](h
 git clone https://github.com/AdamBien/zb.git
 cd zb
 
-# Build with Maven
-mvn clean package
+# Bootstrap zb itself with the installer, then build
+./zbinstall
+java -jar zb.jar
 
-# The executable JAR will be in target/zb.jar
-# Copy it along with the shell wrapper to your desired location
-cp target/zb.jar src/main/sh/zb.sh ~/bin/
+# The executable JAR will be in zbo/app.jar
+# Copy it (as zb.jar) along with the shell wrapper to your desired location
+cp zbo/app.jar ~/bin/zb.jar
+cp src/main/sh/zb.sh ~/bin/
 chmod +x ~/bin/zb.sh
 ```
 

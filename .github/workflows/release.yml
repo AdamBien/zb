@@ -19,22 +19,24 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
-          cache: maven
+
+      - name: Extract version
+        id: version
+        run: echo "version=$(cat src/main/resources/version.txt | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Fetch zb
+        run: java --source 25 zbinstall
 
       - name: Build
-        run: mvn -B clean package
-
-      - name: Read version
-        id: tag
-        run: echo "tag=v$(cat src/main/resources/version.txt | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+        run: java -jar zb.jar
 
       - name: Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ steps.tag.outputs.tag }}
         run: |
-          gh release create "$TAG" \
+          cp zbo/app.jar zb.jar
+          gh release create "v${{ steps.version.outputs.version }}.${{ github.run_number }}" \
             --target "$GITHUB_SHA" \
-            --title "$TAG" \
+            --title "zb ${{ steps.version.outputs.version }} (build ${{ github.run_number }})" \
             --generate-notes \
-            target/zb.jar src/main/sh/zb.sh
+            zb.jar src/main/sh/zb.sh

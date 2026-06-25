@@ -17,8 +17,10 @@ From source:
 ```bash
 git clone https://github.com/AdamBien/zb.git
 cd zb
-mvn clean package
-cp target/zb.jar src/main/sh/zb.sh ~/bin/
+./zbinstall
+java -jar zb.jar
+cp zbo/app.jar ~/bin/zb.jar
+cp src/main/sh/zb.sh ~/bin/
 chmod +x ~/bin/zb.sh
 ```
 
