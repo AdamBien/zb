@@ -1,7 +1,5 @@
 package airhacks.zb.packer.control;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -9,66 +7,89 @@ import java.nio.file.StandardOpenOption;
 import java.util.Optional;
 import java.util.jar.JarOutputStream;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
 public class PackerTest {
-    @Test
-    void addManifest() throws IOException {
-        var mainClass = Path.of("src","main","java","airhacks","App.java");
-        var outputDir = Path.of("target","test");
-        var jarFile = Path.of("target","test.jar");
-        try(var jos = new JarOutputStream(Files.newOutputStream(jarFile,StandardOpenOption.CREATE))){
-            Packer.addManifest(outputDir,jos,mainClass,Optional.empty());
+
+    public static void main(String... args) throws IOException {
+        addManifest();
+        pathToJavaPackage();
+        readVersionFromResourcesWhenRootMissing();
+        readVersionFromProjectRootPreferredOverResources();
+        readVersionFromProjectRootWhenNoResources();
+        readVersionWhenAbsent();
+        manifestIncludesImplementationVersion();
+        manifestOmitsImplementationVersionWhenAbsent();
+        System.out.println("PackerTest passed");
+    }
+
+    static void addManifest() throws IOException {
+        var mainClass = Path.of("src", "main", "java", "airhacks", "App.java");
+        var jarFile = Files.createTempFile("zb-test", ".jar");
+        try (var jos = new JarOutputStream(Files.newOutputStream(jarFile, StandardOpenOption.CREATE))) {
+            Packer.addManifest(jarFile.getParent(), jos, mainClass, Optional.empty());
         }
+        Files.deleteIfExists(jarFile);
     }
 
-    @Test
-    void pathToJavaPackage() {
-        var path = Path.of("airhacks","App");
+    static void pathToJavaPackage() {
+        var path = Path.of("airhacks", "App");
         var javaPackage = Packer.pathToJavaPackage(path);
-        assertThat(javaPackage).isEqualTo("airhacks.App");
+        eq("airhacks.App", javaPackage);
     }
 
-    @Test
-    void readVersionFromResourcesWhenRootMissing(@TempDir Path projectRoot, @TempDir Path resources) throws IOException {
+    static void readVersionFromResourcesWhenRootMissing() throws IOException {
+        var projectRoot = Files.createTempDirectory("zb-root");
+        var resources = Files.createTempDirectory("zb-resources");
         Files.writeString(resources.resolve("version.txt"), "2026.04.26.01\n");
         var version = Packer.readVersion(projectRoot, Optional.of(resources));
-        assertThat(version).contains("2026.04.26.01");
+        contains(version, "2026.04.26.01");
     }
 
-    @Test
-    void readVersionFromProjectRootPreferredOverResources(@TempDir Path projectRoot, @TempDir Path resources) throws IOException {
+    static void readVersionFromProjectRootPreferredOverResources() throws IOException {
+        var projectRoot = Files.createTempDirectory("zb-root");
+        var resources = Files.createTempDirectory("zb-resources");
         Files.writeString(projectRoot.resolve("version.txt"), "2026.05.26.01\n");
         Files.writeString(resources.resolve("version.txt"), "2026.04.26.01\n");
         var version = Packer.readVersion(projectRoot, Optional.of(resources));
-        assertThat(version).contains("2026.05.26.01");
+        contains(version, "2026.05.26.01");
     }
 
-    @Test
-    void readVersionFromProjectRootWhenNoResources(@TempDir Path projectRoot) throws IOException {
+    static void readVersionFromProjectRootWhenNoResources() throws IOException {
+        var projectRoot = Files.createTempDirectory("zb-root");
         Files.writeString(projectRoot.resolve("version.txt"), "2026.05.26.01\n");
         var version = Packer.readVersion(projectRoot, Optional.empty());
-        assertThat(version).contains("2026.05.26.01");
+        contains(version, "2026.05.26.01");
     }
 
-    @Test
-    void readVersionWhenAbsent(@TempDir Path projectRoot, @TempDir Path resources) {
+    static void readVersionWhenAbsent() throws IOException {
+        var projectRoot = Files.createTempDirectory("zb-root");
+        var resources = Files.createTempDirectory("zb-resources");
         var version = Packer.readVersion(projectRoot, Optional.of(resources));
-        assertThat(version).isEmpty();
+        if (version.isPresent())
+            throw new AssertionError("expected empty version but got " + version.get());
     }
 
-    @Test
-    void manifestIncludesImplementationVersion() {
+    static void manifestIncludesImplementationVersion() {
         var manifest = Manifestor.manifest("airhacks.App", Optional.of("2026.04.26.01"));
         var attribute = manifest.getMainAttributes().getValue("Implementation-Version");
-        assertThat(attribute).isEqualTo("2026.04.26.01");
+        eq("2026.04.26.01", attribute);
     }
 
-    @Test
-    void manifestOmitsImplementationVersionWhenAbsent() {
+    static void manifestOmitsImplementationVersionWhenAbsent() {
         var manifest = Manifestor.manifest("airhacks.App", Optional.empty());
         var attribute = manifest.getMainAttributes().getValue("Implementation-Version");
-        assertThat(attribute).isNull();
+        if (attribute != null)
+            throw new AssertionError("expected no Implementation-Version but got " + attribute);
+    }
+
+    static void eq(Object expected, Object actual) {
+        if (!java.util.Objects.equals(expected, actual))
+            throw new AssertionError("expected [%s] but got [%s]".formatted(expected, actual));
+    }
+
+    static void contains(Optional<String> version, String expected) {
+        if (version.isEmpty())
+            throw new AssertionError("expected version containing [%s] but was empty".formatted(expected));
+        if (!version.get().contains(expected))
+            throw new AssertionError("expected [%s] to contain [%s]".formatted(version.get(), expected));
     }
 }

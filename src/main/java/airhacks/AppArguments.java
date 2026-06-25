@@ -34,7 +34,7 @@ public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirect
 
     }
 
-    static AppArguments from(String... args) {
+    public static AppArguments from(String... args) {
         var classesDir = args.length > 1 ? args[1] : Configuration.CLASSES_DIR.get(Defaults.CLASSES_DIR.asString());
         var isTemporary = TEMP_DIR_MARKER.equals(classesDir);
         var classesPath = isTemporary ? createTempDirectory() : Path.of(classesDir);

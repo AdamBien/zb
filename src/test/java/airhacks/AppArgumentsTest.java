@@ -1,102 +1,97 @@
 package airhacks;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.Test;
-
 import airhacks.zb.discovery.control.SourceLocator;
-
 
 public class AppArgumentsTest {
 
+    public static void main(String... args) throws Exception {
+        argumentsWithDefaultValues();
+        argumentsWithCustomValues();
+        argumentsWithPartialCustomValues();
+        defaultArgumentsCreateTempDirectory();
+        explicitlyConfiguredClassesDirectoryIsUsedAsIs();
+        tempDirMarkerInCommandLineCreatesTempDirectory();
+        System.out.println("AppArgumentsTest passed");
+    }
 
-    @Test
-    void argumentsWithDefaultValues() {
+    static void argumentsWithDefaultValues() throws Exception {
         var arguments = AppArguments.from();
-        
-        assertThat(arguments.sourcesDirectory()).isEqualTo(SourceLocator.detectSourceDirectory().orElseThrow());
+
+        eq(SourceLocator.detectSourceDirectory().orElseThrow(), arguments.sourcesDirectory());
         // When using default <temp.dir>, a temporary directory is created
-        assertThat(arguments.classesDirectory().toString()).isNotEqualTo(AppArguments.TEMP_DIR_MARKER);
-        assertThat(arguments.jarDirectory()).isEqualTo(AppArguments.Defaults.JAR_DIR.asPath());
-        assertThat(arguments.jarFileName()).isEqualTo(AppArguments.Defaults.JAR_FILE_NAME);
+        truthy(!arguments.classesDirectory().toString().equals(AppArguments.TEMP_DIR_MARKER),
+                "classesDirectory should not be the temp dir marker");
+        eq(AppArguments.Defaults.JAR_DIR.asPath(), arguments.jarDirectory());
+        eq(AppArguments.Defaults.JAR_FILE_NAME, arguments.jarFileName());
+
+        Files.deleteIfExists(arguments.classesDirectory());
     }
 
-    @Test
-    void argumentsWithCustomValues() {
+    static void argumentsWithCustomValues() {
         var arguments = AppArguments.from(
-            "custom/src",
-            "custom/classes",
-            "custom/jar",
-            "custom.jar"
-        );
-        
-        assertThat(arguments.sourcesDirectory()).isEqualTo(Path.of("custom/src"));
-        assertThat(arguments.classesDirectory()).isEqualTo(Path.of("custom/classes"));
-        assertThat(arguments.jarDirectory()).isEqualTo(Path.of("custom/jar"));
-        assertThat(arguments.jarFileName()).isEqualTo("custom.jar");
+                "custom/src",
+                "custom/classes",
+                "custom/jar",
+                "custom.jar");
+
+        eq(Path.of("custom/src"), arguments.sourcesDirectory());
+        eq(Path.of("custom/classes"), arguments.classesDirectory());
+        eq(Path.of("custom/jar"), arguments.jarDirectory());
+        eq("custom.jar", arguments.jarFileName());
     }
-    
-    @Test
-    void temporaryDirectoryIsCreatedWhenTempDirMarkerIsUsed() {
-        var tempDir = AppArguments.createTempDirectory();
-        
-        assertThat(tempDir).isNotNull();
-        assertThat(Files.exists(tempDir)).isTrue();
-        assertThat(Files.isDirectory(tempDir)).isTrue();
-        assertThat(tempDir.toString()).contains("zb-classes-");
-        
-        // Clean up
-        try {
-            Files.deleteIfExists(tempDir);
-        } catch (Exception e) {
-            // Ignore cleanup errors in test
-        }
+
+    static void argumentsWithPartialCustomValues() throws Exception {
+        var arguments = AppArguments.from("custom/src");
+
+        eq(Path.of("custom/src"), arguments.sourcesDirectory());
+        eq(AppArguments.Defaults.JAR_DIR.asPath(), arguments.jarDirectory());
+        eq(AppArguments.Defaults.JAR_FILE_NAME, arguments.jarFileName());
+
+        Files.deleteIfExists(arguments.classesDirectory());
     }
-    
-    @Test
-    void defaultArgumentsCreateTempDirectory() {
+
+    static void defaultArgumentsCreateTempDirectory() throws Exception {
         var arguments = AppArguments.from();
-        
-        assertThat(arguments.classesDirectory()).isNotNull();
-        assertThat(Files.exists(arguments.classesDirectory())).isTrue();
-        assertThat(Files.isDirectory(arguments.classesDirectory())).isTrue();
-        assertThat(arguments.classesDirectory().toString()).contains("zb-classes-");
-        
-        // Clean up
-        try {
-            Files.deleteIfExists(arguments.classesDirectory());
-        } catch (Exception e) {
-            // Ignore cleanup errors in test
-        }
+
+        truthy(arguments.classesDirectory() != null, "classesDirectory should not be null");
+        truthy(Files.exists(arguments.classesDirectory()), "classesDirectory should exist");
+        truthy(Files.isDirectory(arguments.classesDirectory()), "classesDirectory should be a directory");
+        truthy(arguments.classesDirectory().toString().contains("zb-classes-"),
+                "classesDirectory name should contain zb-classes-");
+
+        Files.deleteIfExists(arguments.classesDirectory());
     }
-    
-    @Test
-    void explicitlyConfiguredClassesDirectoryIsUsedAsIs() {
+
+    static void explicitlyConfiguredClassesDirectoryIsUsedAsIs() {
         var explicitClassesDir = "classes-dir";
         var arguments = AppArguments.from("src/main/java", explicitClassesDir);
-        
-        assertThat(arguments.classesDirectory()).isEqualTo(Path.of(explicitClassesDir));
-        assertThat(arguments.classesDirectory().toString()).isEqualTo(explicitClassesDir);
-    }
-    
-    @Test
-    void tempDirMarkerInCommandLineCreatesTempDirectory() {
-        var arguments = AppArguments.from("src/main/java", AppArguments.TEMP_DIR_MARKER);
-        
-        assertThat(arguments.classesDirectory()).isNotNull();
-        assertThat(Files.exists(arguments.classesDirectory())).isTrue();
-        assertThat(Files.isDirectory(arguments.classesDirectory())).isTrue();
-        assertThat(arguments.classesDirectory().toString()).contains("zb-classes-");
-        
-        // Clean up
-        try {
-            Files.deleteIfExists(arguments.classesDirectory());
-        } catch (Exception e) {
-            // Ignore cleanup errors in test
-        }
+
+        eq(Path.of(explicitClassesDir), arguments.classesDirectory());
+        eq(explicitClassesDir, arguments.classesDirectory().toString());
     }
 
+    static void tempDirMarkerInCommandLineCreatesTempDirectory() throws Exception {
+        var arguments = AppArguments.from("src/main/java", AppArguments.TEMP_DIR_MARKER);
+
+        truthy(arguments.classesDirectory() != null, "classesDirectory should not be null");
+        truthy(Files.exists(arguments.classesDirectory()), "classesDirectory should exist");
+        truthy(Files.isDirectory(arguments.classesDirectory()), "classesDirectory should be a directory");
+        truthy(arguments.classesDirectory().toString().contains("zb-classes-"),
+                "classesDirectory name should contain zb-classes-");
+
+        Files.deleteIfExists(arguments.classesDirectory());
+    }
+
+    static void eq(Object expected, Object actual) {
+        if (!java.util.Objects.equals(expected, actual))
+            throw new AssertionError("expected [%s] but got [%s]".formatted(expected, actual));
+    }
+
+    static void truthy(boolean condition, String message) {
+        if (!condition)
+            throw new AssertionError(message);
+    }
 }
