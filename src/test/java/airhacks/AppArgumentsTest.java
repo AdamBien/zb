@@ -3,6 +3,7 @@ package airhacks;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import airhacks.zb.configuration.control.Configuration;
 import airhacks.zb.discovery.control.SourceLocator;
 
 public class AppArgumentsTest {
@@ -24,8 +25,8 @@ public class AppArgumentsTest {
         // When using default <temp.dir>, a temporary directory is created
         truthy(!arguments.classesDirectory().toString().equals(AppArguments.TEMP_DIR_MARKER),
                 "classesDirectory should not be the temp dir marker");
-        eq(AppArguments.Defaults.JAR_DIR.asPath(), arguments.jarDirectory());
-        eq(AppArguments.Defaults.JAR_FILE_NAME, arguments.jarFileName());
+        eq(configuredJarDirectory(), arguments.jarDirectory());
+        eq(configuredJarFileName(), arguments.jarFileName());
 
         Files.deleteIfExists(arguments.classesDirectory());
     }
@@ -47,8 +48,8 @@ public class AppArgumentsTest {
         var arguments = AppArguments.from("custom/src");
 
         eq(Path.of("custom/src"), arguments.sourcesDirectory());
-        eq(AppArguments.Defaults.JAR_DIR.asPath(), arguments.jarDirectory());
-        eq(AppArguments.Defaults.JAR_FILE_NAME, arguments.jarFileName());
+        eq(configuredJarDirectory(), arguments.jarDirectory());
+        eq(configuredJarFileName(), arguments.jarFileName());
 
         Files.deleteIfExists(arguments.classesDirectory());
     }
@@ -83,6 +84,17 @@ public class AppArgumentsTest {
                 "classesDirectory name should contain zb-classes-");
 
         Files.deleteIfExists(arguments.classesDirectory());
+    }
+
+    /// A no-CLI-arg invocation yields the configured values (`.zb`), falling back
+    /// to the hardcoded defaults — not the defaults themselves, which diverge once
+    /// `.zb` overrides them.
+    static Path configuredJarDirectory() {
+        return Path.of(Configuration.JAR_DIR.get(AppArguments.Defaults.JAR_DIR.asString()));
+    }
+
+    static String configuredJarFileName() {
+        return Configuration.JAR_FILE_NAME.get(AppArguments.Defaults.JAR_FILE_NAME);
     }
 
     static void eq(Object expected, Object actual) {

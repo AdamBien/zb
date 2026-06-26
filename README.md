@@ -18,14 +18,15 @@ Built with pure Java 25, zb compiles and packages your project with zero externa
 
 ## Speed
 
-zb compiles, packages, and tests in seconds — no dependency resolution, no daemon, no warm-up:
+No dependency resolution, no daemon, no warm-up — just `javac` and packaging. Cold-start, measured on LightMetal:
 
-| Project | Build + test | Tests |
-|---------|--------------|-------|
-| [zb](https://github.com/AdamBien/zb) (builds itself) | **1.8s** | 6 unit tests |
-| [zsmith](https://github.com/AdamBien/zsmith) | **2.8s** | 19 unit tests |
+| Project | Build | Tests ([zunit](https://github.com/AdamBien/zunit)) |
+|---------|-------|-------|
+| [zb](https://github.com/AdamBien/zb) (builds itself) | **306 ms** | 6 unit tests in **547 ms** |
+| [zsmith](https://github.com/AdamBien/zsmith) | **679 ms** | 18 unit tests in **1.3 s** |
+| [lightmetal](https://github.com/AdamBien/lightmetal) | **662 ms** | 5 unit tests in **2.6 s** |
 
-These are full builds — compile, package the executable JAR, **and** run the test suite — from a cold start.
+Build = compile + package the executable JAR.
 
 ## Prerequisites
 

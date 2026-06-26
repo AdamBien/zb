@@ -10,6 +10,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import airhacks.zb.configuration.control.Configuration;
 import airhacks.zb.hook.control.PostBuildHook;
 
 public class AppIT {
@@ -29,9 +30,18 @@ public class AppIT {
         return Path.of(AppArguments.Defaults.JAR_DIR.asString(), AppArguments.Defaults.JAR_FILE_NAME);
     }
 
+    /// `App.main` honors `.zb`, so the produced jar path must come from the same
+    /// configuration — not the hardcoded defaults, which diverge once `.zb`
+    /// overrides `jar.dir` or `jar.file.name`.
+    static Path configuredJarFile() {
+        var jarDir = Configuration.JAR_DIR.get(AppArguments.Defaults.JAR_DIR.asString());
+        var jarFileName = Configuration.JAR_FILE_NAME.get(AppArguments.Defaults.JAR_FILE_NAME);
+        return Path.of(jarDir, jarFileName);
+    }
+
     static void createZBJar() throws IOException {
         App.main();
-        var manifest = loadManifest(jarFile());
+        var manifest = loadManifest(configuredJarFile());
         if (manifest == null)
             throw new AssertionError("expected a manifest");
         var mainClass = manifest.getMainAttributes().getValue("Main-Class");
