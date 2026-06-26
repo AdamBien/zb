@@ -14,8 +14,8 @@ public interface PostBuildHook {
     String NONE = "<none>";
 
     /// Suppresses the hook to break recursion. A hook like `zunit` runs the test
-    /// suite, whose integration tests call `App.build`, which would fire the hook
-    /// again — unbounded recursion. Set as an env var on every hook-spawned child
+    /// suite; a test that invokes `zb` (`App.main`) would fire the hook again —
+    /// unbounded recursion. Set as an env var on every hook-spawned child
     /// (inherited by all descendants), or as a system property by in-process
     /// callers (tests) that must build without re-triggering the hook.
     String SKIP_MARKER = "ZB_IN_POST_BUILD_HOOK";

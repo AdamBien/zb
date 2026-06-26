@@ -36,20 +36,20 @@ public interface App {
     }
 
 
-    static void build(AppArguments arguments) throws IOException {
+    static boolean build(AppArguments arguments) throws IOException {
         var sourceDirectory = arguments.sourcesDirectory();
         var classesDirectory = arguments.classesDirectory();
-        
+
         var javaFiles = JavaFiles.findFrom(sourceDirectory);
         var configuredMainClass = Optional.ofNullable(Configuration.MAIN_CLASS.get(null));
         var mainClass = JavaFiles.findMainClass(javaFiles, configuredMainClass);
-        
+
         UserHint.showHint(sourceDirectory, javaFiles, mainClass);
         Directories.createIfNotExists(classesDirectory);
         var compilationSuccess = Compiler.compile(javaFiles, classesDirectory);
         if (!compilationSuccess) {
             Log.warning("⚠️  compilation failed");
-            return;
+            return false;
         }
         Log.user("🔍 compiled %d files".formatted(javaFiles.size()));
 
@@ -62,7 +62,7 @@ public interface App {
         if (arguments.isClassesDirTemporary()) {
             Cleaner.cleanClasses(classesDirectory);
         }
-        PostBuildHook.runIfConfigured(sourceDirectory, jarDirectory, jarFileName);
+        return true;
     }
 
     static void main(String... args) throws IOException {
@@ -70,7 +70,10 @@ public interface App {
         var arguments = AppArguments.from(args);
         arguments.userInfo();
         var stopWatch = StopWatch.start();
-        build(arguments);
+        var success = build(arguments);
         stopWatch.stop();
+        if (success) {
+            PostBuildHook.runIfConfigured(arguments.sourcesDirectory(), arguments.jarDirectory(), arguments.jarFileName());
+        }
     }
 }
