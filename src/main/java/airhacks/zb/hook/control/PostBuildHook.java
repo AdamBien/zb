@@ -13,6 +13,17 @@ public interface PostBuildHook {
 
     String NONE = "<none>";
 
+    /// Suppresses the hook to break recursion. A hook like `zunit` runs the test
+    /// suite, whose integration tests call `App.build`, which would fire the hook
+    /// again — unbounded recursion. Set as an env var on every hook-spawned child
+    /// (inherited by all descendants), or as a system property by in-process
+    /// callers (tests) that must build without re-triggering the hook.
+    String SKIP_MARKER = "ZB_IN_POST_BUILD_HOOK";
+
+    static boolean hookSuppressed() {
+        return Boolean.parseBoolean(System.getenv(SKIP_MARKER)) || Boolean.getBoolean(SKIP_MARKER);
+    }
+
     static Optional<String> configuredHook() {
         var hook = Configuration.POST_BUILD_HOOK.get(NONE);
         if (NONE.equals(hook) || hook.isBlank()) {
@@ -39,6 +50,7 @@ public interface PostBuildHook {
                     .inheritIO()
                     .directory(Path.of(".").toFile());
             var env = processBuilder.environment();
+            env.put(SKIP_MARKER, "true");
             env.put("ZB_JAR_PATH", jarDir.resolve(jarFileName).toString());
             env.put("ZB_SOURCE_DIR", sourceDir.toString());
             env.put("ZB_JAR_DIR", jarDir.toString());
@@ -59,6 +71,9 @@ public interface PostBuildHook {
     }
 
     static void runIfConfigured(Path sourceDir, Path jarDir, String jarFileName) {
+        if (hookSuppressed()) {
+            return;
+        }
         configuredHook().ifPresent(hook -> execute(hook, sourceDir, jarDir, jarFileName));
     }
 }

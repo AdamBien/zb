@@ -24,8 +24,11 @@ public interface App {
 
     String VERSION = "zb v" + readVersion();
 
-    private static String readVersion() {
+    static String readVersion() {
         try (var in = App.class.getResourceAsStream("/version.txt")) {
+            if (in == null) {
+                return "unknown";
+            }
             return new String(in.readAllBytes()).trim();
         } catch (IOException e) {
             return "unknown";

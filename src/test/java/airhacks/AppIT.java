@@ -10,9 +10,14 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import airhacks.zb.hook.control.PostBuildHook;
+
 public class AppIT {
 
     public static void main(String... args) throws IOException {
+        // AppIT exercises the build itself; the post-build hook (e.g. zunit) would
+        // recursively re-run this suite and clobber the JAR under assertion.
+        System.setProperty(PostBuildHook.SKIP_MARKER, "true");
         createZBJar();
         servicesConfigurationFileIsIncluded();
         temporaryClassesDirectoryIsDeleted();

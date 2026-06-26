@@ -16,6 +16,17 @@ Built with pure Java 25, zb compiles and packages your project with zero externa
 - 📦 **Executable JAR generation** out of the box
 - 🎯 **One command, zero config** — sensible defaults, optional `.zb` file when you want control
 
+## Speed
+
+zb compiles, packages, and tests in seconds — no dependency resolution, no daemon, no warm-up:
+
+| Project | Build + test | Tests |
+|---------|--------------|-------|
+| [zb](https://github.com/AdamBien/zb) (builds itself) | **1.8s** | 6 unit tests |
+| [zsmith](https://github.com/AdamBien/zsmith) | **2.8s** | 19 unit tests |
+
+These are full builds — compile, package the executable JAR, **and** run the test suite — from a cold start.
+
 ## Prerequisites
 
 - Java 25 or later
