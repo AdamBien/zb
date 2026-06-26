@@ -2,6 +2,8 @@ package airhacks.zb.hook.control;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import airhacks.zb.configuration.control.Configuration;
@@ -19,10 +21,21 @@ public interface PostBuildHook {
         return Optional.of(hook);
     }
 
+    static boolean isWindows() {
+        return System.getProperty("os.name", "").toLowerCase(Locale.ROOT).contains("win");
+    }
+
+    static List<String> shellCommand(String command) {
+        return isWindows()
+                ? List.of("cmd.exe", "/c", command)
+                : List.of("sh", "-c", command);
+    }
+
     static void execute(String command, Path sourceDir, Path jarDir, String jarFileName) {
         Log.user("🪝 executing post-build hook: %s".formatted(command));
         try {
-            var processBuilder = new ProcessBuilder("sh", "-c", command)
+            var osDependentCommand = shellCommand(command);
+            var processBuilder = new ProcessBuilder(osDependentCommand)
                     .inheritIO()
                     .directory(Path.of(".").toFile());
             var env = processBuilder.environment();

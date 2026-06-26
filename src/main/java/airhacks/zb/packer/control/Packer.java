@@ -96,7 +96,9 @@ public interface Packer {
 
     static void addEntry(JarOutputStream jos, Path relativePath, byte[] content) {
         try {
-            var entry = new JarEntry(relativePath.toString());
+            // JAR/ZIP entry names must use '/' regardless of the host OS separator
+            var slashedPath = relativePath.toString().replace(File.separatorChar, '/');
+            var entry = new JarEntry(slashedPath);
             jos.putNextEntry(entry);
             jos.write(content);
             jos.closeEntry();
