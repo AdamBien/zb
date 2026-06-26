@@ -34,7 +34,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cp zbo/app.jar zb.jar
+          cp zbo/zb.jar zb.jar
           gh release create "v${{ steps.version.outputs.version }}.${{ github.run_number }}" \
             --target "$GITHUB_SHA" \
             --title "zb ${{ steps.version.outputs.version }} (build ${{ github.run_number }})" \

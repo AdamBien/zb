@@ -2,7 +2,7 @@
 #Tue Jul 15 16:26:10 CEST 2025
 classes.dir=<temp.dir>
 jar.dir=zbo/
-jar.file.name=app.jar
+jar.file.name=zb.jar
 post.build.hook=zunit
 resources.dir=<discovered by zb>
 sources.dir=<discovered by zb>
