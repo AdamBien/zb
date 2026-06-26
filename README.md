@@ -1,17 +1,20 @@
 # zb (Zero Dependencies Builder)
 
-A lightweight Java build tool that requires zero external dependencies. Built using pure Java 25 functionality.
+**The entire build tool is a single ~30 KB `zb.jar`.** No install, no daemon, no plugin tree, no `~/.m2` — one tiny jar and a Java 25 runtime is the whole story.
+
+Built with pure Java 25, zb compiles and packages your project with zero external dependencies — its own and yours.
 
 <img src="dukebuilder.png" alt="Duke Builder" width="200">
 
 
-## Features
+## Why zb
 
-- 🚀 Zero external dependencies
-- ⚡ Fast compilation and packaging
-- 🔍 Automatic main class detection
-- 📦 Executable JAR generation
-- 🎯 Simple and intuitive usage
+- 🪶 **~30 KB, one jar** — the whole build tool fits in a single `zb.jar` you can read, commit, and copy anywhere
+- 🚀 **Zero dependencies** — nothing to download but the jar itself; pure Java 25, no third-party libraries
+- ⚡ **Instant builds** — no dependency resolution, no daemon warm-up; just `javac` and packaging
+- 🔍 **Automatic main class detection** — no manifest boilerplate
+- 📦 **Executable JAR generation** out of the box
+- 🎯 **One command, zero config** — sensible defaults, optional `.zb` file when you want control
 
 ## Prerequisites
 
