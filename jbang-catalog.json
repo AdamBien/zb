@@ -1,0 +1,7 @@
+{
+  "aliases": {
+    "zb": {
+      "script-ref": "https://github.com/AdamBien/zb/releases/latest/download/zb.jar"
+    }
+  }
+}
