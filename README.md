@@ -180,6 +180,61 @@ A [/zunit skill](https://github.com/AdamBien/airails/tree/main/java/zunit) is av
 
 zb includes a [SKILL.md](SKILL.md) for use with [airails.dev](https://airails.dev) AI-assisted development workflows.
 
+## Architecture
+
+<!-- sbce:generated:start — projection of the specs; do not edit; `/sbce apply` regenerates from the system doc + per-BC package docs -->
+> Compile and package a dependency-free Java project into a runnable JAR with one zero-configuration command.
+
+**Vision:** A build tool so small and fast it disappears — one readable jar, no install, no waiting.
+
+System doc: [`airhacks.zb`](src/main/java/airhacks/zb/package-info.java)
+
+### Capabilities
+
+- **configuration** — provide build settings from the project's `.zb` configuration file, creating it with defaults on first contact · [`spec`](src/main/java/airhacks/zb/configuration/package-info.java)
+- **discovery** — locate the build inputs: source and resources directories, Java sources, the main class, and service configuration files · [`spec`](src/main/java/airhacks/zb/discovery/package-info.java)
+- **prereqs** — ensure the directories a build needs exist before compilation and packaging · [`spec`](src/main/java/airhacks/zb/prereqs/package-info.java)
+- **compiler** — compile a set of Java source files into a classes directory · [`spec`](src/main/java/airhacks/zb/compiler/package-info.java)
+- **packer** — assemble compiled classes, resources, and version metadata into a runnable JAR · [`spec`](src/main/java/airhacks/zb/packer/package-info.java)
+- **cleanup** — remove transient compilation output after the JAR is packaged · [`spec`](src/main/java/airhacks/zb/cleanup/package-info.java)
+- **hook** — run a user-configured post-build command after a successful build · [`spec`](src/main/java/airhacks/zb/hook/package-info.java)
+- **hints** — turn missing or broken build inputs into actionable guidance for the user · [`spec`](src/main/java/airhacks/zb/hints/package-info.java)
+- **stopwatch** — measure and report the elapsed build time · [`spec`](src/main/java/airhacks/zb/stopwatch/package-info.java)
+- **log** — print color-coded, severity-tagged messages to the console · [`spec`](src/main/java/airhacks/zb/log/package-info.java)
+
+### Components
+
+```mermaid
+flowchart TD
+  shell["application shell (airhacks)"]
+  subgraph bcs["business components (airhacks.zb)"]
+    configuration
+    discovery
+    prereqs
+    compiler
+    packer
+    cleanup
+    hook
+    stopwatch
+    hints
+  end
+  log
+  shell --> configuration
+  shell --> discovery
+  shell --> prereqs
+  shell --> compiler
+  shell --> packer
+  shell --> cleanup
+  shell --> hook
+  shell --> stopwatch
+  discovery --> hints
+  cleanup --> hints
+  hook --> configuration
+  hints --> log
+  bcs -.->|"any BC may call"| log
+```
+<!-- sbce:generated:end -->
+
 ## Videos
 
 [![zb - Zero Dependencies Builder](https://img.youtube.com/vi/7Bes0O3bPwo/0.jpg)](https://www.youtube.com/watch?v=7Bes0O3bPwo)
