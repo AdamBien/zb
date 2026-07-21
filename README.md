@@ -28,6 +28,8 @@ No dependency resolution, no daemon, no warm-up — just `javac` and packaging. 
 
 Build = compile + package the executable JAR.
 
+Fast builds benefit AI coding agents as much as humans. A sub-second compile-package-test loop returns feedback almost instantly, so an agent can run more iterations with less waiting.
+
 ## Prerequisites
 
 - Java 25 or later
