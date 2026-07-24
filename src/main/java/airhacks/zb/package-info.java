@@ -5,7 +5,8 @@
 /// - A build tool so small and fast it disappears — one readable jar, no install, no waiting.
 ///
 /// ## Components
-/// - The application shell (base package `airhacks`) orchestrates the build: configuration → discovery → prereqs → compiler → packer → cleanup → hook, timed by `stopwatch`.
+/// - The application shell (base package `airhacks`) adapts the CLI and delegates to `build`, then runs the post-build `hook`, timed by `stopwatch`.
+/// - `build` orchestrates one run: configuration → discovery → prereqs → compiler → packer → cleanup.
 /// - Any BC may call `log`; `log` calls no other BC.
 /// - `discovery` and `cleanup` may call `hints`; `hints` may call only `log`.
 /// - `hook` may call `configuration`.

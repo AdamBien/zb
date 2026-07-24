@@ -10,6 +10,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import airhacks.zb.build.boundary.Build;
 import airhacks.zb.configuration.control.Configuration;
 import airhacks.zb.hook.control.PostBuildHook;
 
@@ -57,7 +58,7 @@ public class AppIT {
                 AppArguments.Defaults.JAR_DIR.asPath(),
                 AppArguments.Defaults.JAR_FILE_NAME,
                 false);
-        App.build(arguments);
+        Build.perform(arguments);
         var metaINF = loadMetaInfServices(jarFile());
         if (metaINF.size() != 1)
             throw new AssertionError("expected 1 META-INF/services entry but got " + metaINF.size());
@@ -80,7 +81,7 @@ public class AppIT {
 
         if (!Files.exists(tempDir))
             throw new AssertionError("temp dir should exist before build");
-        App.build(arguments);
+        Build.perform(arguments);
         if (Files.exists(tempDir))
             throw new AssertionError("temporary classes directory should have been deleted");
     }
@@ -99,7 +100,7 @@ public class AppIT {
 
         if (!Files.exists(explicitDir))
             throw new AssertionError("explicit dir should exist before build");
-        App.build(arguments);
+        Build.perform(arguments);
         if (!Files.exists(explicitDir))
             throw new AssertionError("explicit classes directory should not be deleted");
 
