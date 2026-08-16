@@ -14,6 +14,7 @@
 /// ### R2: Make the JAR runnable
 /// - R2.1 — When a main class is known, the BC shall record it in the JAR manifest so the JAR is directly executable.
 /// - R2.2 — While no main class is known, the BC shall create the JAR without a manifest.
+/// - R2.3 — When classpath entries are configured and a main class is known, the BC shall record them in the manifest `Class-Path` as URLs relative to the JAR's directory. _(why: `java -jar` resolves `Class-Path` relative to the JAR; entries stay in place, nothing is copied)_
 ///
 /// ### R3: Version metadata
 /// - R3.1 — When a `version.txt` exists in the project root, the BC shall record its content as the implementation version in the manifest and include the file in the JAR.
@@ -23,5 +24,5 @@
 ///
 /// ## Out of scope
 /// - Compilation (owned by `compiler`).
-/// - Signing, compression tuning, or bundling external dependencies.
+/// - Signing, compression tuning, or copying external dependencies into or next to the JAR — classpath entries are referenced in place.
 package airhacks.zb.packer;

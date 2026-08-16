@@ -1,6 +1,7 @@
 package airhacks.zb.build.boundary;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -25,8 +26,11 @@ public interface Build {
         var mainClass = JavaFiles.findMainClass(javaFiles, configuredMainClass);
 
         UserHint.showHint(sourceDirectory, javaFiles, mainClass);
+        arguments.classpath().stream()
+                .filter(entry -> !Files.exists(entry))
+                .forEach(UserHint::classpathEntryNotFound);
         Directories.createIfNotExists(classesDirectory);
-        var compilationSuccess = Compiler.compile(javaFiles, classesDirectory);
+        var compilationSuccess = Compiler.compile(javaFiles, classesDirectory, arguments.classpath());
         if (!compilationSuccess) {
             Log.warning("⚠️  compilation failed");
             return false;
@@ -38,7 +42,7 @@ public interface Build {
         var jarDirectory = arguments.jarDirectory();
         var jarFileName = arguments.jarFileName();
 
-        Packer.createJAR(Path.of("."), classesDirectory, resourcesDirectory, jarDirectory, jarFileName, relativeMainClass);
+        Packer.createJAR(Path.of("."), classesDirectory, resourcesDirectory, jarDirectory, jarFileName, relativeMainClass, arguments.classpath());
         if (arguments.isClassesDirTemporary()) {
             Cleaner.cleanClasses(classesDirectory);
         }

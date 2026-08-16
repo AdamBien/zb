@@ -10,6 +10,7 @@
 /// - R1.1 — If the source directory does not exist, then the BC shall report it and show usage guidance with an example invocation.
 /// - R1.2 — If no Java files were found, then the BC shall warn the user and suggest checking the directory.
 /// - R1.3 — If no main class was found, then the BC shall warn the user and explain how to declare one.
+/// - R1.4 — If a configured classpath entry does not exist, then the BC shall warn the user and point at the `classpath` setting.
 ///
 /// ### R2: Report failures
 /// - R2.1 — When an error is reported, the BC shall present the message to the user as an error.

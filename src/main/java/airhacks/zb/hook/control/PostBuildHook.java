@@ -11,8 +11,6 @@ import airhacks.zb.log.control.Log;
 
 public interface PostBuildHook {
 
-    String NONE = "<none>";
-
     /// Suppresses the hook to break recursion. A hook like `zunit` runs the test
     /// suite; a test that invokes `zb` (`App.main`) would fire the hook again —
     /// unbounded recursion. Set as an env var on every hook-spawned child
@@ -25,8 +23,8 @@ public interface PostBuildHook {
     }
 
     static Optional<String> configuredHook() {
-        var hook = Configuration.POST_BUILD_HOOK.get(NONE);
-        if (NONE.equals(hook) || hook.isBlank()) {
+        var hook = Configuration.POST_BUILD_HOOK.get(Configuration.NONE);
+        if (Configuration.NONE.equals(hook) || hook.isBlank()) {
             return Optional.empty();
         }
         return Optional.of(hook);

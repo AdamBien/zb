@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarOutputStream;
 
@@ -18,6 +19,10 @@ public class PackerTest {
         readVersionWhenAbsent();
         manifestIncludesImplementationVersion();
         manifestOmitsImplementationVersionWhenAbsent();
+        relativeToJarForSiblingDirectory();
+        relativeToJarForNestedJarDirectory();
+        manifestIncludesClassPath();
+        manifestOmitsClassPathWhenEmpty();
         System.out.println("PackerTest passed");
     }
 
@@ -25,7 +30,7 @@ public class PackerTest {
         var mainClass = Path.of("src", "main", "java", "airhacks", "App.java");
         var jarFile = Files.createTempFile("zb-test", ".jar");
         try (var jos = new JarOutputStream(Files.newOutputStream(jarFile, StandardOpenOption.CREATE))) {
-            Packer.addManifest(jarFile.getParent(), jos, mainClass, Optional.empty());
+            Packer.addManifest(jarFile.getParent(), jos, mainClass, Optional.empty(), List.of());
         }
         Files.deleteIfExists(jarFile);
     }
@@ -79,6 +84,29 @@ public class PackerTest {
         var attribute = manifest.getMainAttributes().getValue("Implementation-Version");
         if (attribute != null)
             throw new AssertionError("expected no Implementation-Version but got " + attribute);
+    }
+
+    static void relativeToJarForSiblingDirectory() {
+        var entries = Manifestor.relativeToJar(Path.of("zbo"), List.of(Path.of("lib/a.jar")));
+        eq(List.of("../lib/a.jar"), entries);
+    }
+
+    static void relativeToJarForNestedJarDirectory() {
+        var entries = Manifestor.relativeToJar(Path.of("build/out"), List.of(Path.of("lib/a.jar")));
+        eq(List.of("../../lib/a.jar"), entries);
+    }
+
+    static void manifestIncludesClassPath() {
+        var manifest = Manifestor.manifest("airhacks.App", Optional.empty(), List.of("../lib/a.jar", "../lib/b.jar"));
+        var attribute = manifest.getMainAttributes().getValue("Class-Path");
+        eq("../lib/a.jar ../lib/b.jar", attribute);
+    }
+
+    static void manifestOmitsClassPathWhenEmpty() {
+        var manifest = Manifestor.manifest("airhacks.App", Optional.empty());
+        var attribute = manifest.getMainAttributes().getValue("Class-Path");
+        if (attribute != null)
+            throw new AssertionError("expected no Class-Path but got " + attribute);
     }
 
     static void eq(Object expected, Object actual) {

@@ -48,11 +48,15 @@ resources.dir=<discovered by zb>
 classes.dir=<temp.dir>
 jar.dir=zbo/
 jar.file.name=app.jar
+post.build.hook=<none>
+classpath=<none>
 ```
+
+External JARs are listed colon-separated in `classpath` (e.g. `classpath=lib/a.jar:lib/b.jar`); they are passed to `javac` and referenced in the manifest `Class-Path` — never resolved or copied.
 
 ## When to Use zb
 
-- Java 21+ projects without external dependencies
+- Java 21+ projects without dependency resolution — external JARs are listed explicitly via `classpath`
 - Single-module applications with `void main()` entry point
 - Quick prototyping without Maven/Gradle overhead
 

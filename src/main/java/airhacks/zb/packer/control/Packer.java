@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 import java.util.Optional;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -18,17 +19,22 @@ public interface Packer {
     String VERSION_FILE = "version.txt";
 
     static void createJAR(Path projectRoot, Path rootClassesDirectory, Optional<Path> rootResourcesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass) throws IOException {
+        createJAR(projectRoot, rootClassesDirectory, rootResourcesDirectory, rootJARDirectory, jarFileName, mainClass, List.of());
+    }
+
+    static void createJAR(Path projectRoot, Path rootClassesDirectory, Optional<Path> rootResourcesDirectory, Path rootJARDirectory, String jarFileName, Optional<Path> mainClass, List<Path> classpath) throws IOException {
         var jarFile = rootJARDirectory.resolve(jarFileName);
         Files.createDirectories(rootJARDirectory);
         Files.deleteIfExists(jarFile);
 
         var versionFile = locateVersionFile(projectRoot, rootResourcesDirectory);
         var version = versionFile.flatMap(Packer::readVersionContent);
+        var classPathEntries = Manifestor.relativeToJar(rootJARDirectory, classpath);
 
         try (var fos = Files.newOutputStream(jarFile, StandardOpenOption.CREATE_NEW);
              var jos = new JarOutputStream(fos)) {
 
-            mainClass.ifPresent(mc -> addManifest(rootClassesDirectory, jos, mc, version));
+            mainClass.ifPresent(mc -> addManifest(rootClassesDirectory, jos, mc, version, classPathEntries));
 
             try (var paths = Files.walk(rootClassesDirectory)) {
                 paths.filter(path -> path.toString().endsWith(".class"))
@@ -76,10 +82,10 @@ public interface Packer {
         }
     }
 
-    static void addManifest(Path rootClassesDirectory, JarOutputStream jos, Path mainClass, Optional<String> version) {
+    static void addManifest(Path rootClassesDirectory, JarOutputStream jos, Path mainClass, Optional<String> version, List<String> classPathEntries) {
         var javaPackage = pathToJavaPackage(mainClass);
         var fullyQualifiedClassName = javaPackage.replace(".java", "");
-        var manifest = Manifestor.manifest(fullyQualifiedClassName, version);
+        var manifest = Manifestor.manifest(fullyQualifiedClassName, version, classPathEntries);
         try {
             var entry = new JarEntry("META-INF/MANIFEST.MF");
             jos.putNextEntry(entry);

@@ -1,5 +1,5 @@
 /// # zb — Zero Dependencies Builder
-/// > Compile and package a dependency-free Java project into a runnable JAR with one zero-configuration command.
+/// > Compile and package a Java project — dependency-free by default, with an optional explicit classpath — into a runnable JAR with one zero-configuration command.
 ///
 /// ## Vision
 /// - A build tool so small and fast it disappears — one readable jar, no install, no waiting.
@@ -8,7 +8,7 @@
 /// - The application shell (base package `airhacks`) adapts the CLI and delegates to `build`, then runs the post-build `hook`, timed by `stopwatch`.
 /// - `build` orchestrates one run: configuration → discovery → prereqs → compiler → packer → cleanup.
 /// - Any BC may call `log`; `log` calls no other BC.
-/// - `discovery` and `cleanup` may call `hints`; `hints` may call only `log`.
+/// - `build`, `discovery`, and `cleanup` may call `hints`; `hints` may call only `log`.
 /// - `hook` may call `configuration`.
 /// - `compiler` and `packer` call no other BC.
 /// - BCs never call the application shell. _(why: the shell composes BCs; an upward call inverts the build's dependency direction)_
@@ -24,6 +24,7 @@
 /// - Classes directory — where compiled classes land; a temporary directory by default.
 /// - JAR — the runnable build output.
 /// - Main class — the entry point recorded in the JAR manifest.
+/// - Classpath — external JARs the sources compile and run against; listed explicitly in the configuration file, never resolved or bundled.
 /// - Configuration file — the `.zb` properties file in the project root. Owned by `configuration`.
 /// - Setting — one named value in the configuration file; `<discovered by zb>` defers it to discovery.
 /// - Post-build hook — a user-configured command run after a successful build. Owned by `hook`.

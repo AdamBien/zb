@@ -10,8 +10,13 @@
 /// - R1.2 — When all files compile, the BC shall report success.
 /// - R1.3 — If any file fails to compile, then the BC shall report failure.
 ///
+/// ### R2: Compile against a classpath
+/// - R2.1 — When classpath entries are configured, the BC shall pass them to javac via `--class-path`.
+/// - R2.2 — While no classpath is configured, the BC shall compile without a classpath option.
+///
 /// ## Out of scope
 /// - Discovering which files to compile (owned by `discovery`).
 /// - Creating the output directory (owned by `prereqs`).
-/// - Classpath or dependency resolution — zb builds dependency-free projects.
+/// - Dependency resolution or download — classpath entries are given, never fetched.
+/// - Validating that classpath entries exist (owned by the caller via `hints`).
 package airhacks.zb.compiler;

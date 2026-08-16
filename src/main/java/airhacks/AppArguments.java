@@ -1,7 +1,9 @@
 package airhacks;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import airhacks.zb.configuration.control.Configuration;
 import airhacks.zb.discovery.control.ResourceLocator;
@@ -9,7 +11,7 @@ import airhacks.zb.discovery.control.SourceLocator;
 import airhacks.zb.log.control.Log;
 
 public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirectory, Path classesDirectory,
-        Path jarDirectory, String jarFileName, boolean isClassesDirTemporary) {
+        Path jarDirectory, String jarFileName, boolean isClassesDirTemporary, List<Path> classpath) {
     
     public static final String TEMP_DIR_MARKER = "<temp.dir>";
     public enum Defaults {
@@ -45,9 +47,25 @@ public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirect
                 classesPath,
                 Path.of(args.length > 2 ? args[2] : Configuration.JAR_DIR.get(Defaults.JAR_DIR.asString())),
                 args.length > 3 ? args[3] : Configuration.JAR_FILE_NAME.get(Defaults.JAR_FILE_NAME),
-                isTemporary);
+                isTemporary,
+                classpathFromConfiguration());
     }
-    
+
+    static List<Path> classpathFromConfiguration() {
+        return parseClasspath(Configuration.CLASSPATH.get(Configuration.NONE));
+    }
+
+    public static List<Path> parseClasspath(String value) {
+        if (value == null || value.isBlank() || Configuration.NONE.equals(value)) {
+            return List.of();
+        }
+        return Stream.of(value.split(":"))
+                .map(String::trim)
+                .filter(entry -> !entry.isBlank())
+                .map(Path::of)
+                .toList();
+    }
+
     static Path createTempDirectory() {
         try {
             var tempDir = java.nio.file.Files.createTempDirectory("zb-classes-");
@@ -65,6 +83,9 @@ public record AppArguments(Path sourcesDirectory, Optional<Path> resourcesDirect
         } else {
             Log.user(
                     "🔍 sources: %s, classes: %s, JAR dir: %s, JAR file: %s".formatted(sourcesDirectory, classesDirectory, jarDirectory, jarFileName));
+        }
+        if (!classpath.isEmpty()) {
+            Log.user("🔍 classpath: %s".formatted(classpath));
         }
     }
 

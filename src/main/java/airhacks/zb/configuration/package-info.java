@@ -18,4 +18,5 @@
 /// ## Out of scope
 /// - Command-line argument parsing and precedence (owned by the application shell).
 /// - Discovering source or resources directories (owned by `discovery`).
+/// - Interpreting the `<none>` sentinel (owned by each consumer).
 package airhacks.zb.configuration;

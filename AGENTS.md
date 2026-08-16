@@ -5,7 +5,7 @@ Use zb to build Java 21+ projects without external dependencies.
 ## When to Use
 
 - Java projects with `void main()` entry point
-- No Maven/Gradle dependencies required
+- No Maven/Gradle dependency resolution — external JARs are listed explicitly via `classpath` in `.zb`
 - Single-module applications
 
 ## Build Command
@@ -41,6 +41,7 @@ resources.dir=src/main/resources
 classes.dir=<temp>
 jar.dir=zbo/
 jar.file.name=app.jar
+classpath=lib/a.jar:lib/b.jar
 ```
 
 ## Verification

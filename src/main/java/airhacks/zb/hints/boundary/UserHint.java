@@ -39,6 +39,11 @@ public interface UserHint {
         System.exit(0);
     }
 
+    static void classpathEntryNotFound(Path entry) {
+        Log.warning("⚠️  classpath entry not found: " + entry.toAbsolutePath());
+        Log.user("💡 Check the classpath property in .zb");
+    }
+
     static void noMainClassFound() {
         Log.warning("⚠️  No main class found in the Java files.");
         Log.user("💡 Ensure at least one class has a 'public static void main(String[] args)' method.");

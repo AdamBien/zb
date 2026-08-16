@@ -2,7 +2,7 @@
 
 **The entire build tool is a single ~30 KB `zb.jar`.** No install, no daemon, no plugin tree, no `~/.m2` — one tiny jar and a Java 25 runtime is the whole story.
 
-Built with pure Java 25, zb compiles and packages your project with zero external dependencies — its own and yours.
+Built with pure Java 25, zb compiles and packages your project with zero external dependencies — its own and, by default, yours. Projects that do need external JARs list them explicitly via the `classpath` property; zb never resolves or downloads anything.
 
 <img src="dukebuilder.png" alt="Duke Builder" width="200">
 
@@ -123,6 +123,7 @@ zb supports configuration through a `.zb` properties file in your project root. 
 | `jar.dir` | JAR output directory | `zbo/` |
 | `jar.file.name` | Name of the generated JAR file | `app.jar` |
 | `post.build.hook` | Script to execute after a successful build | `<none>` |
+| `classpath` | Colon-separated JARs (project-relative) to compile and run against | `<none>` |
 
 ### Example Configuration
 
@@ -160,6 +161,18 @@ post.build.hook=zunit
 
 The hook receives build context as environment variables: `ZB_JAR_PATH`, `ZB_SOURCE_DIR`, `ZB_JAR_DIR`, `ZB_JAR_FILE_NAME`. A non-zero exit code is logged as a warning but does not fail the build.
 
+### External JARs (classpath)
+
+Projects that need external JARs list them explicitly in the `classpath` property, colon-separated:
+
+```properties
+classpath=lib/postgresql.jar:lib/commons-csv.jar
+```
+
+The entries are passed to `javac` via `--class-path` and recorded in the JAR manifest as `Class-Path` URLs relative to the JAR's directory, so `java -jar zbo/app.jar` resolves them at runtime. The JARs stay where they are — nothing is copied, resolved, or downloaded. A missing entry produces a warning, not a build failure.
+
+Limitations: entries must be project-relative paths, and paths containing spaces are unsupported (space separates manifest `Class-Path` entries).
+
 ## How It Works
 
 1. **Source Discovery**: Automatically finds all Java files in the source directory
@@ -185,7 +198,7 @@ zb includes a [SKILL.md](SKILL.md) for use with [airails.dev](https://airails.de
 ## Architecture
 
 <!-- sbce:generated:start — projection of the specs; do not edit; `/sbce apply` regenerates from the system doc + per-BC package docs -->
-> Compile and package a dependency-free Java project into a runnable JAR with one zero-configuration command.
+> Compile and package a Java project — dependency-free by default, with an optional explicit classpath — into a runnable JAR with one zero-configuration command.
 
 **Vision:** A build tool so small and fast it disappears — one readable jar, no install, no waiting.
 

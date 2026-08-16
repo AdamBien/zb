@@ -2,6 +2,7 @@ package airhacks;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import airhacks.zb.configuration.control.Configuration;
 import airhacks.zb.discovery.control.SourceLocator;
@@ -15,6 +16,12 @@ public class AppArgumentsTest {
         defaultArgumentsCreateTempDirectory();
         explicitlyConfiguredClassesDirectoryIsUsedAsIs();
         tempDirMarkerInCommandLineCreatesTempDirectory();
+        parseClasspathWithMultipleEntries();
+        parseClasspathWithSingleEntry();
+        parseClasspathWithNoneSentinel();
+        parseClasspathWithBlankValue();
+        parseClasspathTrimsEntries();
+        argumentsWithoutClasspathConfiguration();
         System.out.println("AppArgumentsTest passed");
     }
 
@@ -84,6 +91,36 @@ public class AppArgumentsTest {
                 "classesDirectory name should contain zb-classes-");
 
         Files.deleteIfExists(arguments.classesDirectory());
+    }
+
+    static void parseClasspathWithMultipleEntries() {
+        var classpath = AppArguments.parseClasspath("lib/a.jar:lib/b.jar");
+        eq(List.of(Path.of("lib/a.jar"), Path.of("lib/b.jar")), classpath);
+    }
+
+    static void parseClasspathWithSingleEntry() {
+        var classpath = AppArguments.parseClasspath("lib/a.jar");
+        eq(List.of(Path.of("lib/a.jar")), classpath);
+    }
+
+    static void parseClasspathWithNoneSentinel() {
+        eq(List.of(), AppArguments.parseClasspath(Configuration.NONE));
+    }
+
+    static void parseClasspathWithBlankValue() {
+        eq(List.of(), AppArguments.parseClasspath(""));
+        eq(List.of(), AppArguments.parseClasspath("   "));
+        eq(List.of(), AppArguments.parseClasspath(null));
+    }
+
+    static void parseClasspathTrimsEntries() {
+        var classpath = AppArguments.parseClasspath(" lib/a.jar : lib/b.jar ");
+        eq(List.of(Path.of("lib/a.jar"), Path.of("lib/b.jar")), classpath);
+    }
+
+    static void argumentsWithoutClasspathConfiguration() {
+        var arguments = AppArguments.from("custom/src", "custom/classes");
+        eq(List.of(), arguments.classpath());
     }
 
     /// A no-CLI-arg invocation yields the configured values (`.zb`), falling back
