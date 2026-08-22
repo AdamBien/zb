@@ -1,0 +1,28 @@
+# Publishing metadata for zpublish. Copy this file into any zb-built project, replace the
+# values, and the project publishes to Maven Central without a pom.xml.
+#
+# Required: groupId, artifactId, name, description, url, license.name, developer.id,
+#           developer.name, scm.url, scm.connection
+# Optional: inceptionYear, license.url, developer.email, developer.url,
+#           scm.developerConnection, scm.tag - unset ones are omitted from the POM
+#
+# ~/.zpublish supplies local convenience defaults; this file wins key by key. Required keys
+# belong here, in the repository: a CI runner has no home directory.
+
+groupId=com.airhacks
+artifactId=zb
+name=zb
+description=Zero Dependencies Builder - compiles Java 25 projects and packages \
+            executable JARs with no external dependencies.
+url=https://github.com/AdamBien/zb
+
+license.name=MIT License
+license.url=https://github.com/AdamBien/zb/blob/main/LICENSE
+
+developer.id=AdamBien
+developer.name=Adam Bien
+developer.url=https://airhacks.com
+
+scm.url=https://github.com/AdamBien/zb
+scm.connection=scm:git:https://github.com/AdamBien/zb.git
+scm.developerConnection=scm:git:git@github.com:AdamBien/zb.git

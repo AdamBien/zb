@@ -51,3 +51,21 @@ Run the built JAR:
 ```bash
 java -jar zbo/app.jar
 ```
+
+## Publishing (zpublish)
+
+`zpublish` is a single-file Java 25 script in the repository root that publishes the built
+JAR to Maven Central. It never builds — build first. Configuration is split: `.zb` supplies
+the build paths (`jar.dir`, `jar.file.name`, `classpath`), `.zpublish` supplies the POM
+metadata. Never write to `.zb` from `zpublish`; the build tool owns that file.
+
+Its tests live inside the script, not under `src/`, so zunit does not reach them and
+`java -jar zb.jar` does not exercise them:
+
+```bash
+java --source 25 zpublish -selftest   # in-script assertions
+java --source 25 zpublish -dry-run    # stage, sign, checksum, bundle - no upload
+```
+
+Both run on every pull request and every push to `main`
+(`.github/workflows/publish-central.yml`).

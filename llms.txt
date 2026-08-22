@@ -12,6 +12,15 @@ curl -o ~/bin/zb.sh https://raw.githubusercontent.com/AdamBien/zb/main/src/main/
 chmod +x ~/bin/zb.sh
 ```
 
+From a Maven repository (Maven Central, or any corporate mirror proxying it):
+
+```bash
+mvn dependency:get -Dartifact=com.airhacks:zb:<version>
+curl -O https://<mirror>/com/airhacks/zb/<version>/zb-<version>.jar
+```
+
+`<version>` is the release tag without its leading `v` (tag `v2026.08.16.01.19` resolves as `2026.08.16.01.19`), and `zb-<version>.jar` is built from that release's tag, carrying the full Maven version as its `Implementation-Version`. Central carries the releases tagged after the channel was set up; every earlier release is on GitHub only, and nothing has been published to Central yet — check https://central.sonatype.com/artifact/com.airhacks/zb before pointing a build at it. Central carries only that jar plus the POM, sources and javadoc artifacts it mandates; `zb.sh` stays on GitHub and is optional. zb has no Maven dependency — Central is a distribution channel only.
+
 From source:
 
 ```bash
@@ -53,6 +62,23 @@ classpath=<none>
 ```
 
 External JARs are listed colon-separated in `classpath` (e.g. `classpath=lib/a.jar:lib/b.jar`); they are passed to `javac` and referenced in the manifest `Class-Path` — never resolved or copied.
+
+## Publishing to Maven Central
+
+`zpublish` is a single-file Java 25 script in the repository root that publishes an already-built jar to Central without a `pom.xml` and without Maven. Nothing in it is zb-specific: copy it into any zb-built project, add a `.zpublish`, build, then `java --source 25 zpublish -dry-run`.
+
+Build paths come from `.zb` (`jar.dir`, `jar.file.name`, `classpath`); sources, resources and `version.txt` are discovered. `.zb` must exist beside `.zpublish` and be committed when the pipeline builds and publishes in separate jobs. Sources in the project root are refused: the sources jar is packaged unfiltered, so a root-level source root would ship `.git` and the build output; move them under `src/main/java` or `src`. POM metadata comes from `.zpublish`:
+
+```properties
+# required
+groupId, artifactId, name, description, url, license.name, developer.id, developer.name, scm.url, scm.connection
+# optional - omitted from the POM when unset
+inceptionYear, license.url, developer.email, developer.url, scm.developerConnection, scm.tag
+```
+
+`~/.zpublish` then `./.zpublish`, the local file winning key by key. The required keys are demanded of the repo-tracked `./.zpublish` alone and a global file never supplies them — a CI runner has no home directory, and a stale global `groupId` would publish under another project's coordinates. `~/.zpublish` defaults the optional keys. Version order: `-version-string`, `ZPUBLISH_VERSION`, `version.txt` in the project root then the resource root. `ZPUBLISH_GPG_KEY_ID`, `ZPUBLISH_GPG_PASSPHRASE`, `CENTRAL_TOKEN_USERNAME` and `CENTRAL_TOKEN_PASSWORD` come from the environment only; either GPG variable unset skips signing, which a dry run allows and an upload does not. Exactly one developer and one license are supported.
+
+`zpublish` lives outside `src/`, so `java -jar zb.jar` does not test it. Its assertions run only via `java --source 25 zpublish -selftest`; `java --source 25 zpublish -dry-run` stages, checksums and bundles without uploading. Both run on every pull request and every push to `main`.
 
 ## When to Use zb
 
