@@ -1,0 +1,312 @@
+name: publish-central
+
+# Two non-obvious facts shape this file:
+#
+# 1. There is deliberately no `push: tags` trigger. `release.yml` creates its tag with
+#    `gh release create` running under GITHUB_TOKEN, and GitHub's recursion prevention
+#    means a tag pushed by GITHUB_TOKEN does not start any other workflow. An
+#    `on: push: tags: ['v*']` trigger would therefore silently never fire for exactly
+#    the releases it exists to publish, so it is omitted rather than shipped broken.
+#
+# 2. `workflow_dispatch` only appears in the Actions UI once this file is on the default
+#    branch. The `preflight`/`build`/`publish` chain below cannot be exercised from a pull
+#    request branch at all; pre-merge, only the `validate` job runs.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to publish, e.g. v2026.08.16.01.42'
+        required: true
+        type: string
+  pull_request:
+  # `release.yml` cuts a release on every push to `main`, and a `workflow_dispatch` on that
+  # tag publishes an immutable Central version. Without this trigger the selftest and the
+  # dry run - the only checks that `.zpublish` is complete and loadable - would never have
+  # run for the commit being published, and a broken `.zpublish` would first surface inside
+  # the job holding the signing key and the Central token.
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # The workflow's own test: it exercises staging, sources/javadoc packaging, the
+  # signing-skip path, checksums, bundling and validation with no secrets at all.
+  validate:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Fetch zb
+        run: java --source 25 zbinstall
+
+      - name: Build
+        run: java -jar zb.jar
+
+      - name: Selftest
+        run: java --source 25 zpublish -selftest
+
+      - name: Dry run
+        run: java --source 25 zpublish -dry-run
+
+  # Three jobs rather than one, and the split is a trust boundary, not tidiness.
+  #
+  # `build` runs `zbinstall`, which downloads `zb.jar` from the *latest* release - a
+  # mutable artifact that the tag under publication does not pin - and then executes it.
+  # `publish` holds the GPG private key and the Central token. Keeping those two in one
+  # job would hand the builder every channel a later step in that job reads: it could
+  # rewrite the checked-out `zpublish` before it runs with the token in its environment,
+  # append to `$GITHUB_PATH` to shim the `gpg` that the private key is piped into, or
+  # append to `$GITHUB_ENV`. Ordering the builder ahead of the key import closes only the
+  # direct read of `~/.gnupg`, not any of those.
+  #
+  # That a compromised builder could still poison the jar `publish` signs is a different
+  # and lesser failure: it yields one bad, revocable release, whereas an exfiltrated
+  # signing key and Central token are a standing capability to publish anything under
+  # `com.airhacks:zb`. The split is what separates the two, and the price is one artifact
+  # hop.
+  #
+  # `preflight` exists so a dispatch with unconfigured secrets or a malformed tag fails in
+  # under a minute instead of after the build, without those secrets ever entering the job
+  # that runs the builder.
+  preflight:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      # No `tag` output: what the later jobs need is the commit, and exposing the name
+      # beside it would only invite a checkout of the name again.
+      maven-version: ${{ steps.version.outputs.maven-version }}
+      sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      # The `secrets` context is not available in `if:` conditions at either job or step
+      # level - `if: secrets.X != ''` is an expression error, not a skip. Mapping the
+      # secrets to `env` and checking them in a step is the working form.
+      #
+      # All five, not just the token user: a run missing only GPG_KEY_ID would otherwise
+      # check out, build and import the key before failing inside zpublish.
+      - name: Require publishing secrets
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          ZPUBLISH_GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          ZPUBLISH_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          missing=""
+          [ -n "$CENTRAL_TOKEN_USERNAME" ] || missing="$missing CENTRAL_TOKEN_USERNAME"
+          [ -n "$CENTRAL_TOKEN_PASSWORD" ] || missing="$missing CENTRAL_TOKEN_PASSWORD"
+          [ -n "$GPG_PRIVATE_KEY" ] || missing="$missing GPG_PRIVATE_KEY"
+          [ -n "$ZPUBLISH_GPG_PASSPHRASE" ] || missing="$missing GPG_PASSPHRASE"
+          [ -n "$ZPUBLISH_GPG_KEY_ID" ] || missing="$missing GPG_KEY_ID"
+          if [ -n "$missing" ]; then
+            echo "::error::Repository secrets are missing:$missing"
+            exit 1
+          fi
+
+      # `grep` is line-oriented and would accept a multi-line input whose *first* line
+      # looks like a tag; the remaining lines would then be written verbatim into
+      # $GITHUB_OUTPUT, defining arbitrary job outputs that the later jobs expand into a
+      # checkout ref and a shell. Bash's `=~` matches the whole string, newlines included.
+      - name: Resolve version
+        id: version
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9][0-9A-Za-z.-]*$ ]]; then
+            echo "::error::tag is not of the expected form v<version>"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "maven-version=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      # The regex above makes the input tag-shaped, not a tag. `actions/checkout` given a
+      # bare name fetches `refs/heads/<name>` and `refs/tags/<name>` and prefers the
+      # branch, so a branch named `v...` would win over the tag of that name; and a tag
+      # can be moved between `build` and `publish`, whose checkouts are independent. Both
+      # end the same way: the binary jar and the sources jar of one immutable Central
+      # release built from different commits. Resolving the tag to a commit once, here,
+      # and checking out that commit in both jobs closes both, and a dispatch naming a
+      # tag that does not exist now fails in the preflight instead of in a checkout.
+      - name: Resolve tag commit
+        id: commit
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          # The singular `git/ref/` endpoint is an exact match - a prefix that hits no tag
+          # is a 404 here, where the plural one would answer with a list of near misses.
+          if ! object=$(gh api "repos/$REPO/git/ref/tags/$TAG" \
+                          --jq '.object.type + " " + .object.sha'); then
+            echo "::error::$REPO has no tag $TAG"
+            exit 1
+          fi
+          type=${object%% *}
+          sha=${object#* }
+          # An annotated tag's ref names the tag object, not the commit under it.
+          if [ "$type" = tag ]; then
+            object=$(gh api "repos/$REPO/git/tags/$sha" \
+                       --jq '.object.type + " " + .object.sha')
+            type=${object%% *}
+            sha=${object#* }
+          fi
+          if [ "$type" != commit ] || [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::tag $TAG does not resolve to a commit"
+            exit 1
+          fi
+          echo "$TAG is $sha"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
+  # No `secrets` mapping anywhere in this job: it is the one that runs unpinned code.
+  #
+  # No `if:` either - a job-level `if:` replaces the implicit `success()`, so restating
+  # the event condition here would let this job run after a failed `preflight`. Depending
+  # on `preflight` is what skips this job on a pull request.
+  build:
+    needs: preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MAVEN_VERSION: ${{ needs.preflight.outputs.maven-version }}
+    steps:
+      # Build from the commit the tag resolved to in `preflight`, not from main, so the
+      # Central artifact is built from the same source as the GitHub Release - and, since
+      # `publish` checks out that same sha, from the same source as the sources jar
+      # published beside it. Only tags cut after this workflow lands on main carry
+      # `zpublish`.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.sha }}
+          # Nothing here talks to git after the checkout, and the next step runs code from
+          # a mutable release: the default would leave the job token in .git/config for it
+          # to read.
+          persist-credentials: false
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Stamp version
+        run: |
+          # Keeps the jar's Implementation-Version equal to its Central coordinate;
+          # without it `java -jar zb.jar` would print a version that resolves in no
+          # repository. Working-tree only - never committed.
+          echo "$MAVEN_VERSION" > src/main/resources/version.txt
+
+      - name: Fetch zb
+        run: java --source 25 zbinstall
+
+      - name: Build
+        run: java -jar zb.jar
+
+      # A single explicit file, not `zbo/`: the builder writes that directory, and this is
+      # the only channel it has into the job that holds the key. `if-no-files-found: error`
+      # turns a build that silently produced nothing into a failure here rather than into
+      # a confusing "build zb first" from zpublish two jobs later.
+      - name: Upload built jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: zb-jar
+          path: zbo/zb.jar
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: [preflight, build]
+    runs-on: ubuntu-latest
+    # An upload that stalls would otherwise sit until GitHub's 6-hour default while
+    # holding the signing key and the Central token.
+    timeout-minutes: 30
+    env:
+      MAVEN_VERSION: ${{ needs.preflight.outputs.maven-version }}
+    steps:
+      # A fresh checkout of the same commit `build` used, not the build job's workspace:
+      # `zpublish`, `src/` and everything else this job executes or packages comes from
+      # the sha `preflight` pinned, and the only thing carried over from the build is the
+      # jar itself.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.sha }}
+          # Nothing in this job talks to git after the checkout, and this is the job that
+          # holds the signing key and the Central token: the default would leave the job
+          # token in .git/config for every later step.
+          persist-credentials: false
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      # Repeated here, not inherited from the build job: `zpublish` packages
+      # `src/main/resources` into the sources jar, so an unstamped checkout would publish
+      # a sources jar whose `version.txt` disagrees with the jar beside it.
+      - name: Stamp version
+        run: echo "$MAVEN_VERSION" > src/main/resources/version.txt
+
+      - name: Download built jar
+        uses: actions/download-artifact@v4
+        with:
+          name: zb-jar
+          path: zbo
+
+      - name: Prepare gpg agent
+        run: |
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          # zpublish signs with --pinentry-mode loopback and feeds the passphrase on
+          # stdin. The runner's gpg-agent refuses loopback unless allowed explicitly;
+          # omitting this is the most common Central-publishing CI failure.
+          echo allow-loopback-pinentry >> ~/.gnupg/gpg-agent.conf
+          gpg-connect-agent reloadagent /bye
+
+      - name: Import signing key
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          printf '%s\n' "$GPG_PRIVATE_KEY" | gpg --batch --import
+          fingerprint=$(gpg --list-secret-keys --with-colons | awk -F: '/^fpr:/ {print $10; exit}')
+          echo "$fingerprint:6:" | gpg --batch --import-ownertrust
+
+      - name: Verify signing key
+        env:
+          ZPUBLISH_GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+        run: |
+          gpg --list-secret-keys --keyid-format LONG
+          # Fail here rather than at the first signature: a mistyped id produces a far
+          # clearer message than a signing run that finds no such key. gpg resolves the
+          # id itself, which is what makes this gate agree with the signing step:
+          # grepping the colon listing by hand accepts neither the `0x`-prefixed nor the
+          # uid form that `--local-user` takes, and an unanchored match over that listing
+          # also hits creation timestamps and uid text, so a mistyped id would pass here
+          # and fail at the first signature.
+          if ! gpg --list-secret-keys --with-colons -- "$ZPUBLISH_GPG_KEY_ID" > /dev/null 2>&1; then
+            echo "::error::GPG_KEY_ID is not among the imported secret keys"
+            exit 1
+          fi
+
+      # Mapped per step rather than for the whole job: the checkout and the artifact
+      # download have no business being able to read the signing key out of their
+      # environment.
+      - name: Publish to Maven Central
+        env:
+          CENTRAL_TOKEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          CENTRAL_TOKEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          ZPUBLISH_GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+          ZPUBLISH_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: java --source 25 zpublish -version-string "$MAVEN_VERSION"
