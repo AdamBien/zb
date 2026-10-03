@@ -195,6 +195,10 @@ A [/zunit skill](https://github.com/AdamBien/airails/tree/main/java/zunit) is av
 
 zb includes a [SKILL.md](SKILL.md) for use with [airails.dev](https://airails.dev) AI-assisted development workflows.
 
+## Related Tools
+
+- [zunit](https://github.com/AdamBien/zunit) — zero-dependency, single-file test runner that reads the `.zb` configuration
+
 ## Architecture
 
 <!-- sbce:generated:start — projection of the specs; do not edit; `/sbce apply` regenerates from the system doc + per-BC package docs -->
