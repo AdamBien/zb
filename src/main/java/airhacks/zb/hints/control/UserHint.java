@@ -1,4 +1,4 @@
-package airhacks.zb.hints.boundary;
+package airhacks.zb.hints.control;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import airhacks.zb.hints.boundary.UserHint;
+import airhacks.zb.hints.control.UserHint;
 import airhacks.zb.log.control.Log;
 
 public interface JavaFiles {

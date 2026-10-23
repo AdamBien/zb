@@ -10,7 +10,7 @@ import airhacks.zb.cleanup.control.Cleaner;
 import airhacks.zb.compiler.control.Compiler;
 import airhacks.zb.configuration.control.Configuration;
 import airhacks.zb.discovery.control.JavaFiles;
-import airhacks.zb.hints.boundary.UserHint;
+import airhacks.zb.hints.control.UserHint;
 import airhacks.zb.log.control.Log;
 import airhacks.zb.packer.control.Packer;
 import airhacks.zb.prereqs.control.Directories;

@@ -5,7 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
-import airhacks.zb.hints.boundary.UserHint;
+import airhacks.zb.hints.control.UserHint;
 
 public interface Cleaner {
 
